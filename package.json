@@ -1,0 +1,34 @@
+{
+  "name": "anise",
+  "version": "1.0.0",
+  "description": "AI-powered meal planning app",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@nuxt/eslint-config": "^0.2.0",
+    "@nuxt/typescript-build": "^3.0.0",
+    "eslint": "^8.0.0",
+    "nuxt": "^3.13.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.0.0",
+    "drizzle-orm": "^0.44.0",
+    "@electric-sql/pglite": "^0.3.0",
+    "drizzle-kit": "^0.31.0"
+  }
+}
