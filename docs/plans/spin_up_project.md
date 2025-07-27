@@ -1,15 +1,15 @@
 # Initial Plan for Anise Meal Planning App
 
 ## Phase 1: Project Foundation & Setup
-1. **Create project structure** with separate frontend (Vue + TypeScript) and backend (Node.js + Fastify) directories
-2. **Initialize frontend** with Vue 3, TypeScript, Vite, and essential dependencies (Vue Router, Pinia for state management)
-3. **Initialize backend** with Fastify, TypeScript, and Drizzle ORM
+1. **Initialize Nuxt project** with TypeScript and Vue 3 (full-stack approach for fast iteration)
+2. **Set up Nuxt UI** for component library and consistent design system
+3. **Configure Drizzle ORM** with PGlite for local development database
 4. **Set up development environment** following your TS starter preferences:
    - pnpm as package manager
-   - Modular config files (eslint.config.mjs, .prettierrc, tsconfig.json)
-   - ESLint + Prettier with single quotes
+   - ESLint configuration with Nuxt standards
+   - Prettier for code formatting
    - Future: husky pre-commit hooks
-5. **Database setup** with PGlite for local development (easier PostgreSQL production transition)
+5. **Create basic project structure** with pages, server API routes, and database schema
 
 ## Phase 2: MVP Core Features (Simplified)
 1. **Recipe Management**: Basic CRUD operations for recipes with ingredients and instructions
@@ -21,11 +21,11 @@
 - Advanced features
 
 ## Technology Decisions
-- **Frontend**: Vue 3 + TypeScript + Vite + Tailwind CSS
-- **Backend**: Fastify + TypeScript + Drizzle ORM
-- **Database**: PGlite (dev) → PostgreSQL (prod)
+- **Framework**: Nuxt 4 (full-stack Vue 3 + TypeScript)
+- **UI Library**: @nuxt/ui for components and design system
+- **Database**: Drizzle ORM + PGlite (dev) → PostgreSQL (prod)
 - **Package Manager**: pnpm
-- **Tooling**: ESLint, Prettier, modular configs
+- **Tooling**: @nuxt/eslint, Prettier, TypeScript
 
 ## Implementation Notes
 - Start with Phase 1 foundation
