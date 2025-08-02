@@ -1,22 +1,25 @@
 import * as cheerio from 'cheerio';
+import { llmService, type RecipeData } from './llmService';
 
 export interface RecipeContentResult {
   success: boolean;
   url: string;
-  content: string;
-  contentLength: number;
+  recipe: RecipeData;
 }
 
 class RecipeService {
-  async fetchByUrl(url: string) {
-    const content = this.fetchAndCleanContent(url);
+  async fetchByUrl(url: string): Promise<RecipeContentResult> {
+    const cleanedContent = await this.fetchAndCleanContent(url);
+    const recipe = await llmService.extractRecipe(cleanedContent);
 
-    return content;
+    return {
+      success: true,
+      url: url,
+      recipe: recipe
+    };
   }
 
-  private async fetchAndCleanContent(
-    url: string
-  ): Promise<RecipeContentResult> {
+  private async fetchAndCleanContent(url: string): Promise<string> {
     // Fetch the webpage
     const response = await fetch(url);
 
@@ -77,14 +80,7 @@ class RecipeService {
       .replace(/\n{3,}/g, '\n\n') // Clean up multiple newlines to max 2 (do this last)
       .trim();
 
-    content = cleanedContent;
-
-    return {
-      success: true,
-      url: url,
-      content: content,
-      contentLength: content.length,
-    };
+    return cleanedContent;
   }
 }
 

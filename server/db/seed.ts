@@ -10,10 +10,10 @@ export async function seedDatabase(db: PgliteDatabase<typeof schema>) {
   }
 
   // Insert sample users
-  const users = await db.insert(schema.users).values([
+  await db.insert(schema.users).values([
     { email: 'john@example.com', name: 'John Doe' },
     { email: 'jane@example.com', name: 'Jane Smith' },
-  ]).returning()
+  ])
 
   console.log('Database seeded with sample data')
 }
