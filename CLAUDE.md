@@ -48,3 +48,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Package Manager
 
 This project uses `pnpm` as the package manager. Always use `pnpm` commands instead of npm or yarn.
+
+## Development Workflow
+
+- When making changes to code, ALWAYS run `pnpm run lint` and `pnpm run typecheck` afterwards to ensure you're code is matching our style and typing systems.
