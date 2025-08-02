@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Use recipe service to fetch and clean content
-  const result = await recipeService.fetchAndCleanContent(url);
+  const result = await recipeService.fetchByUrl(url);
 
   return result;
 });
