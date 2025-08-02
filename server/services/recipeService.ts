@@ -45,19 +45,33 @@ export const recipeService = {
 
     for (const selector of contentSelectors) {
       const element = $(selector).first();
-      if (element.length && element.text().trim()) {
-        content = element.text().trim();
+      if (element.length && element.html()?.trim()) {
+        content = element.html()?.trim() || '';
         break;
       }
     }
 
     // Fallback to body if no main content found
     if (!content) {
-      content = $('body').text().trim();
+      content = $('body').html()?.trim() || '';
     }
 
-    // Clean up whitespace
-    content = content.replace(/\s+/g, ' ').trim();
+    // Convert HTML to more readable text while preserving structure
+    const cleanedContent = content
+      .replace(/<h[1-6][^>]*>/gi, '\n### ')   // Convert headings to markdown-style
+      .replace(/<\/h[1-6]>/gi, '\n')
+      .replace(/<li[^>]*>/gi, '\n• ')         // Convert list items to bullet points  
+      .replace(/<\/li>/gi, '')
+      .replace(/<p[^>]*>/gi, '\n')           // Convert paragraphs to single line breaks
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<br[^>]*>/gi, '\n')          // Convert breaks to line breaks
+      .replace(/<[^>]+>/g, ' ')              // Remove remaining HTML tags
+      .replace(/\n{2,}/g, '\n')              // Clean up multiple newlines to single
+      .replace(/[ \t]+/g, ' ')               // Clean up multiple spaces
+      .replace(/\n /g, '\n')                 // Remove spaces after newlines
+      .trim();
+
+    content = cleanedContent;
 
     return {
       success: true,
