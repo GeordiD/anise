@@ -1,0 +1,19 @@
+import * as schema from './schema'
+import type { PgliteDatabase } from 'drizzle-orm/pglite'
+
+export async function seedDatabase(db: PgliteDatabase<typeof schema>) {
+  // Check if users already exist
+  const existingUsers = await db.select().from(schema.users).limit(1)
+  if (existingUsers.length > 0) {
+    console.log('Database already seeded')
+    return
+  }
+
+  // Insert sample users
+  const users = await db.insert(schema.users).values([
+    { email: 'john@example.com', name: 'John Doe' },
+    { email: 'jane@example.com', name: 'Jane Smith' },
+  ]).returning()
+
+  console.log('Database seeded with sample data')
+}
