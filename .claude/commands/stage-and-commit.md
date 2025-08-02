@@ -6,9 +6,15 @@ When making a commit message, follow these guidelines:
 - The message should be detailed and not vague (while still being brief)
 - The message should convey the overall direction of the changeset, not listing out file by file
 - If you're working from a plan, look at your task names / phase names for inspiration.
+- Reference the user given context (below) when making your message. It might include good context about the state of what we're working on
+  - Sometimes we want to commit something that's WIP and will need a lot of edits
+  - Other times we've really refined the changeset and are locking in this code.
+  - Unless otherwise specified, it's safe to assume the changes are more permanent.
 
 Good examples:
 
 - 'Phase 1: Added endpoint'
 - 'Install and setup database'
 - 'Initial implementation of user management feature'
+
+User Given Context: "$ARGUMENTS"
