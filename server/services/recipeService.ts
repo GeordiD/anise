@@ -72,9 +72,9 @@ class RecipeService {
       .replace(/<\/p>/gi, '\n')
       .replace(/<br[^>]*>/gi, '\n') // Convert breaks to line breaks
       .replace(/<[^>]+>/g, ' ') // Remove remaining HTML tags
-      .replace(/\n{2,}/g, '\n') // Clean up multiple newlines to single
       .replace(/[ \t]+/g, ' ') // Clean up multiple spaces
       .replace(/\n /g, '\n') // Remove spaces after newlines
+      .replace(/\n{3,}/g, '\n\n') // Clean up multiple newlines to max 2 (do this last)
       .trim();
 
     content = cleanedContent;
