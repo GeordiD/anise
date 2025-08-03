@@ -2,82 +2,89 @@ import { z } from 'zod';
 
 // Zod schema for recipe data with comprehensive validation
 export const recipeSchema = z.object({
-  name: z.string()
+  name: z
+    .string()
     .min(1, 'Recipe name is required')
     .max(200, 'Recipe name too long')
-    .describe('The name of the recipe'),
-  
-  description: z.string()
-    .max(500, 'Description too long')
-    .optional()
-    .describe('Brief description of the recipe'),
-  
-  prepTime: z.string()
+    .describe(
+      'The name of the recipe. Keep this as generic as possible while still being descriptive.'
+    ),
+
+  prepTime: z
+    .string()
     .max(50, 'Prep time too long')
     .optional()
-    .describe('Preparation time (e.g., "15 minutes", "1 hour")'),
-  
-  cookTime: z.string()
+    .describe(
+      'Preparation time listed in the recipe (e.g., "15 minutes", "1 hour")'
+    ),
+
+  cookTime: z
+    .string()
     .max(50, 'Cook time too long')
     .optional()
-    .describe('Cooking time (e.g., "30 minutes", "2 hours")'),
-  
-  totalTime: z.string()
+    .describe(
+      'Cooking time listed in the recipe (e.g., "30 minutes", "2 hours")'
+    ),
+
+  totalTime: z
+    .string()
     .max(50, 'Total time too long')
     .optional()
-    .describe('Total time from start to finish'),
-  
-  servings: z.string()
+    .describe(
+      'Total time from start to finish (listed in the recipe -- do not calculate this yourself)'
+    ),
+
+  servings: z
+    .string()
     .max(50, 'Servings too long')
     .optional()
     .describe('Number of servings (e.g., "4 people", "6-8 servings")'),
-  
-  difficulty: z.enum(['easy', 'medium', 'hard'])
-    .optional()
-    .describe('Difficulty level of the recipe'),
-  
-  cuisine: z.string()
+
+  cuisine: z
+    .string()
     .max(100, 'Cuisine too long')
     .optional()
     .describe('Type of cuisine (e.g., "Italian", "Chinese", "American")'),
-  
-  ingredients: z.array(
-    z.string()
-      .min(1, 'Ingredient cannot be empty')
-      .max(200, 'Ingredient description too long')
-      .describe('Individual ingredient with quantity and description')
-  )
+
+  ingredients: z
+    .array(
+      z
+        .string()
+        .min(1, 'Ingredient cannot be empty')
+        .max(200, 'Ingredient description too long')
+        .describe('Individual ingredient with quantity and description')
+    )
     .min(1, 'At least one ingredient is required')
     .max(50, 'Too many ingredients')
-    .describe('List of all ingredients needed for the recipe'),
-  
-  instructions: z.array(
-    z.string()
-      .min(1, 'Instruction cannot be empty')
-      .max(500, 'Instruction too long')
-      .describe('Individual step in the cooking process')
-  )
+    .describe(
+      'List of all ingredients needed for the recipe. This should match the recipe exactly'
+    ),
+
+  instructions: z
+    .array(
+      z
+        .string()
+        .min(1, 'Instruction cannot be empty')
+        .max(500, 'Instruction too long')
+        .describe('Individual step in the cooking process')
+    )
     .min(1, 'At least one instruction is required')
     .max(30, 'Too many instructions')
     .describe('Step-by-step cooking instructions'),
-  
-  notes: z.string()
-    .max(1000, 'Notes too long')
+
+  notes: z
+    .array(
+      z
+        .string()
+        .min(1, 'Note cannot be empty')
+        .max(200, 'Note too long')
+        .describe('Individual important note, tip, or variation')
+    )
+    .max(6, 'Too many notes - only include the most important ones')
     .optional()
-    .describe('Additional notes, tips, or variations for the recipe'),
-  
-  nutrition: z.object({
-    calories: z.number().positive().optional(),
-    protein: z.string().optional(),
-    carbs: z.string().optional(),
-    fat: z.string().optional(),
-    fiber: z.string().optional()
-  }).optional().describe('Nutritional information if available'),
-  
-  tags: z.array(z.string().max(50))
-    .max(20, 'Too many tags')
-    .optional()
-    .describe('Recipe tags like "vegetarian", "gluten-free", "quick", etc.')
+    .describe(
+      'Only the most important notes, tips, or variations. If not critically important, omit entirely.'
+    ),
 });
 
 // TypeScript type inferred from Zod schema
@@ -89,56 +96,62 @@ export const recipeJsonSchema = {
   properties: {
     name: {
       type: 'string',
-      description: 'The name of the recipe'
+      description: 'The name of the recipe',
     },
     description: {
       type: 'string',
-      description: 'Brief description of the recipe'
+      description: 'Brief description of the recipe',
     },
     prepTime: {
       type: 'string',
-      description: 'Preparation time (e.g., "15 minutes", "1 hour")'
+      description: 'Preparation time (e.g., "15 minutes", "1 hour")',
     },
     cookTime: {
       type: 'string',
-      description: 'Cooking time (e.g., "30 minutes", "2 hours")'
+      description: 'Cooking time (e.g., "30 minutes", "2 hours")',
     },
     totalTime: {
       type: 'string',
-      description: 'Total time from start to finish'
+      description: 'Total time from start to finish',
     },
     servings: {
       type: 'string',
-      description: 'Number of servings (e.g., "4 people", "6-8 servings")'
+      description: 'Number of servings (e.g., "4 people", "6-8 servings")',
     },
     difficulty: {
       type: 'string',
       enum: ['easy', 'medium', 'hard'],
-      description: 'Difficulty level of the recipe'
+      description: 'Difficulty level of the recipe',
     },
     cuisine: {
       type: 'string',
-      description: 'Type of cuisine (e.g., "Italian", "Chinese", "American")'
+      description: 'Type of cuisine (e.g., "Italian", "Chinese", "American")',
     },
     ingredients: {
       type: 'array',
       items: {
         type: 'string',
-        description: 'Individual ingredient with quantity and description'
+        description: 'Individual ingredient with quantity and description',
       },
-      description: 'List of all ingredients needed for the recipe'
+      description: 'List of all ingredients needed for the recipe',
     },
     instructions: {
       type: 'array',
       items: {
         type: 'string',
-        description: 'Individual step in the cooking process'
+        description: 'Individual step in the cooking process',
       },
-      description: 'Step-by-step cooking instructions'
+      description: 'Step-by-step cooking instructions',
     },
     notes: {
-      type: 'string',
-      description: 'Additional notes, tips, or variations for the recipe'
+      type: 'array',
+      items: {
+        type: 'string',
+        description: 'Individual important note, tip, or variation',
+      },
+      maxItems: 6,
+      description:
+        'Only the most important notes, tips, or variations. If not critically important, omit entirely.',
     },
     nutrition: {
       type: 'object',
@@ -147,18 +160,19 @@ export const recipeJsonSchema = {
         protein: { type: 'string' },
         carbs: { type: 'string' },
         fat: { type: 'string' },
-        fiber: { type: 'string' }
+        fiber: { type: 'string' },
       },
-      description: 'Nutritional information if available'
+      description: 'Nutritional information if available',
     },
     tags: {
       type: 'array',
       items: { type: 'string' },
-      description: 'Recipe tags like "vegetarian", "gluten-free", "quick", etc.'
-    }
+      description:
+        'Recipe tags like "vegetarian", "gluten-free", "quick", etc.',
+    },
   },
   required: ['name', 'ingredients', 'instructions'],
-  additionalProperties: false
+  additionalProperties: false,
 };
 
 // Tool definition for OpenRouter
@@ -166,7 +180,8 @@ export const extractRecipeTool = {
   type: 'function' as const,
   function: {
     name: 'extract_recipe',
-    description: 'Extract structured recipe information from the provided content',
-    parameters: recipeJsonSchema
-  }
+    description:
+      'Extract structured recipe information from the provided content',
+    parameters: recipeJsonSchema,
+  },
 };
