@@ -1,14 +1,8 @@
-export interface RecipeData {
-  name: string;
-  description?: string;
-  prepTime?: string;
-  cookTime?: string;
-  totalTime?: string;
-  servings?: string;
-  ingredients: string[];
-  instructions: string[];
-  notes?: string;
-}
+import {
+  extractRecipeTool,
+  recipeSchema,
+  type RecipeData,
+} from '../schemas/recipeSchema';
 
 export class LLMService {
   private apiKey: string;
@@ -21,31 +15,55 @@ export class LLMService {
     }
   }
 
-  async extractRecipe(content: string): Promise<RecipeData> {
-    const prompt = `Extract recipe information from the following content and return it as JSON.
+  async extractRecipe(
+    content: string,
+    maxRetries: number = 3
+  ): Promise<RecipeData> {
+    let lastError: Error | null = null;
 
-Content:
-${content}
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await this.attemptRecipeExtraction(content, attempt);
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error('Unknown error');
 
-Return a JSON object with this exact structure:
-{
-  "name": "Recipe Name",
-  "description": "Brief description (optional)",
-  "prepTime": "Prep time if available",
-  "cookTime": "Cook time if available", 
-  "totalTime": "Total time if available",
-  "servings": "Number of servings if available",
-  "ingredients": ["ingredient 1", "ingredient 2", ...],
-  "instructions": ["step 1", "step 2", ...],
-  "notes": "Any additional notes (optional)"
-}
+        if (attempt === maxRetries) {
+          break;
+        }
+
+        // Wait before retrying (exponential backoff)
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.pow(2, attempt - 1) * 1000)
+        );
+      }
+    }
+
+    throw createError({
+      statusCode: 500,
+      statusMessage: `Failed to extract recipe after ${maxRetries} attempts: ${
+        lastError?.message || 'Unknown error'
+      }`,
+    });
+  }
+
+  private async attemptRecipeExtraction(
+    content: string,
+    attempt: number
+  ): Promise<RecipeData> {
+    const prompt = `Extract recipe information from the provided content. Use the extract_recipe tool to return the structured data.
 
 Guidelines:
 - Extract ingredients as individual items, preserving quantities and descriptions
 - Extract instructions as numbered steps in order
 - Include timing information if present
 - Be precise and don't add information not in the content
-- Return only the JSON object, no additional text`;
+- If information is not available, omit that field
+- For difficulty, choose from: easy, medium, hard (or omit if unclear)
+
+Content:
+<content>
+${content}
+</content>`;
 
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
@@ -63,35 +81,33 @@ Guidelines:
             content: prompt,
           },
         ],
-        temperature: 0.1,
+        tools: [extractRecipeTool],
+        tool_choice: {
+          type: 'function',
+          function: { name: 'extract_recipe' },
+        },
+        temperature: attempt > 1 ? 0.2 : 0.1, // Slightly increase temperature on retries
       }),
     });
 
     if (!response.ok) {
-      throw createError({
-        statusCode: response.status,
-        statusMessage: `OpenRouter API error: ${response.statusText}`,
-      });
+      throw new Error(
+        `OpenRouter API error: ${response.status} ${response.statusText}`
+      );
     }
 
     const data = await response.json();
-    const content_text = data.choices[0]?.message?.content;
+    const toolCall = data.choices[0]?.message?.tool_calls?.[0];
 
-    if (!content_text) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'No content received from LLM',
-      });
+    if (!toolCall || toolCall.function.name !== 'extract_recipe') {
+      throw new Error('No tool call received from LLM');
     }
 
-    try {
-      return JSON.parse(content_text);
-    } catch {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Failed to parse LLM response as JSON',
-      });
-    }
+    const rawData = JSON.parse(toolCall.function.arguments);
+    
+    // Validate with Zod schema
+    const validatedData = recipeSchema.parse(rawData);
+    return validatedData;
   }
 }
 

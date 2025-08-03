@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio';
-import { llmService, type RecipeData } from './llmService';
+import { llmService } from './llmService';
+import type { RecipeData } from '../schemas/recipeSchema';
 
 export interface RecipeContentResult {
   success: boolean;
