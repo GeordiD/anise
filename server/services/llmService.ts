@@ -4,6 +4,20 @@ import {
   type RecipeData,
 } from '../schemas/recipeSchema';
 
+export interface UsageStats {
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  inputCost: number;
+  outputCost: number;
+  totalCost: number;
+}
+
+export interface RecipeExtractionResult {
+  recipe: RecipeData;
+  usage: UsageStats;
+}
+
 export class LLMService {
   private apiKey: string;
   private baseUrl = 'https://openrouter.ai/api/v1';
@@ -18,7 +32,7 @@ export class LLMService {
   async extractRecipe(
     content: string,
     maxRetries: number = 3
-  ): Promise<RecipeData> {
+  ): Promise<RecipeExtractionResult> {
     let lastError: Error | null = null;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -49,7 +63,7 @@ export class LLMService {
   private async attemptRecipeExtraction(
     content: string,
     attempt: number
-  ): Promise<RecipeData> {
+  ): Promise<RecipeExtractionResult> {
     const prompt = `Extract recipe information from the provided content. Use the extract_recipe tool to return the structured data.
 
 Guidelines:
@@ -104,10 +118,42 @@ ${content}
     }
 
     const rawData = JSON.parse(toolCall.function.arguments);
-    
+
     // Validate with Zod schema
     const validatedData = recipeSchema.parse(rawData);
-    return validatedData;
+
+    // Calculate usage and costs
+    const usage = this.calculateUsage(data.usage);
+
+    return {
+      recipe: validatedData,
+      usage,
+    };
+  }
+
+  private calculateUsage(usage: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  }) {
+    // Calculate usage and costs
+    const inputTokens = usage?.prompt_tokens || 0;
+    const outputTokens = usage?.completion_tokens || 0;
+    const totalTokens = usage?.total_tokens || 0;
+
+    // Claude 3.5 Sonnet pricing: $3/M input, $15/M output
+    const inputCost = (inputTokens / 1000000) * 3;
+    const outputCost = (outputTokens / 1000000) * 15;
+    const totalCost = inputCost + outputCost;
+
+    return {
+      inputTokens,
+      outputTokens,
+      totalTokens,
+      inputCost: Number(inputCost.toFixed(3)),
+      outputCost: Number(outputCost.toFixed(3)),
+      totalCost: Number(totalCost.toFixed(3)),
+    };
   }
 }
 

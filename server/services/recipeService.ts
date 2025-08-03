@@ -1,22 +1,24 @@
 import * as cheerio from 'cheerio';
-import { llmService } from './llmService';
+import { llmService, type UsageStats } from './llmService';
 import type { RecipeData } from '../schemas/recipeSchema';
 
 export interface RecipeContentResult {
   success: boolean;
   url: string;
   recipe: RecipeData;
+  usage?: UsageStats;
 }
 
 class RecipeService {
   async fetchByUrl(url: string): Promise<RecipeContentResult> {
     const cleanedContent = await this.fetchAndCleanContent(url);
-    const recipe = await llmService.extractRecipe(cleanedContent);
+    const result = await llmService.extractRecipe(cleanedContent);
 
     return {
       success: true,
       url: url,
-      recipe: recipe
+      recipe: result.recipe,
+      usage: result.usage
     };
   }
 
