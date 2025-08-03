@@ -48,16 +48,31 @@ export const recipeSchema = z.object({
 
   ingredients: z
     .array(
-      z
-        .string()
-        .min(1, 'Ingredient cannot be empty')
-        .max(200, 'Ingredient description too long')
-        .describe('Individual ingredient with quantity and description')
+      z.object({
+        name: z
+          .string()
+          .max(100, 'Group name too long')
+          .optional()
+          .describe(
+            'Name of ingredient group (e.g., "For the marinade", "For the sauce"). Leave blank if only one group.'
+          ),
+        items: z
+          .array(
+            z
+              .string()
+              .min(1, 'Ingredient cannot be empty')
+              .max(200, 'Ingredient description too long')
+              .describe('Individual ingredient with quantity and description')
+          )
+          .min(1, 'At least one ingredient is required per group')
+          .max(30, 'Too many ingredients in group')
+          .describe('List of ingredients in this group'),
+      })
     )
-    .min(1, 'At least one ingredient is required')
-    .max(50, 'Too many ingredients')
+    .min(1, 'At least one ingredient group is required')
+    .max(10, 'Too many ingredient groups')
     .describe(
-      'List of all ingredients needed for the recipe. This should match the recipe exactly'
+      'Ingredient groups. Most recipes have one group (leave name blank). Use multiple groups for recipes with sections like "For the marinade", "For the main dish", etc.'
     ),
 
   instructions: z
@@ -130,10 +145,28 @@ export const recipeJsonSchema = {
     ingredients: {
       type: 'array',
       items: {
-        type: 'string',
-        description: 'Individual ingredient with quantity and description',
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+            description:
+              'Name of ingredient group (e.g., "For the marinade", "For the sauce"). Leave blank if only one group.',
+          },
+          items: {
+            type: 'array',
+            items: {
+              type: 'string',
+              description:
+                'Individual ingredient with quantity and description',
+            },
+            description: 'List of ingredients in this group',
+          },
+        },
+        required: ['items'],
+        additionalProperties: false,
       },
-      description: 'List of all ingredients needed for the recipe',
+      description:
+        'Ingredient groups. Most recipes have one group (leave name blank). Use multiple groups for recipes with sections like "For the marinade", "For the sauce", etc.',
     },
     instructions: {
       type: 'array',
