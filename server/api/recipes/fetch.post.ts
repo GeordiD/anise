@@ -1,4 +1,4 @@
-import { recipeService } from '../../services/recipeService';
+import { recipeScraper } from '../../services/recipeScraper';
 
 interface RecipeFetchRequest {
   url: string;
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Use recipe service to fetch and clean content
-  const result = await recipeService.fetchByUrl(url);
+  const result = await recipeScraper.fetchByUrl(url);
 
   return result;
 });
