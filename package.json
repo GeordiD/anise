@@ -30,6 +30,7 @@
     "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.4"
+    "drizzle-kit": "^0.31.4",
+    "tailwindcss": "^4.1.12"
   }
 }
