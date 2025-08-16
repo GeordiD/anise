@@ -1,8 +1,15 @@
 import * as cheerio from 'cheerio';
-import { llmService, type UsageStats } from './llmService';
-import type { RecipeData } from '../schemas/recipeSchema';
 import { getDb } from '../db';
-import { recipes, recipeIngredientGroups, recipeIngredients, recipeInstructions, recipeNotes, tokenUsage } from '../db/schema';
+import {
+  recipeIngredientGroups,
+  recipeIngredients,
+  recipeInstructions,
+  recipeNotes,
+  recipes,
+  tokenUsage,
+} from '../db/schema';
+import type { RecipeData } from '../schemas/recipeSchema';
+import { llmService, type UsageStats } from './llmService';
 
 export interface RecipeContentResult {
   success: boolean;
@@ -17,13 +24,17 @@ class RecipeService {
     const result = await llmService.extractRecipe(cleanedContent);
 
     // Save recipe to database
-    const savedRecipe = await this.saveRecipeToDatabase(result.recipe, url, result.usage);
+    const savedRecipe = await this.saveRecipeToDatabase(
+      result.recipe,
+      url,
+      result.usage
+    );
 
     return {
       success: true,
       url: url,
       recipe: savedRecipe,
-      usage: result.usage
+      usage: result.usage,
     };
   }
 
@@ -92,8 +103,8 @@ class RecipeService {
   }
 
   private async saveRecipeToDatabase(
-    recipeData: RecipeData, 
-    sourceUrl: string, 
+    recipeData: RecipeData,
+    sourceUrl: string,
     usage: UsageStats
   ): Promise<RecipeData & { id: number }> {
     const db = await getDb();
@@ -101,53 +112,94 @@ class RecipeService {
     // Use a transaction to ensure all data is saved atomically
     return await db.transaction(async (tx) => {
       // 1. Insert the main recipe
-      const [savedRecipe] = await tx.insert(recipes).values({
-        name: recipeData.name,
-        prepTime: recipeData.prepTime,
-        cookTime: recipeData.cookTime,
-        totalTime: recipeData.totalTime,
-        servings: recipeData.servings,
-        cuisine: recipeData.cuisine,
-        sourceUrl: sourceUrl,
-      }).returning();
+      const [savedRecipe] = await tx
+        .insert(recipes)
+        .values({
+          name: recipeData.name,
+          prepTime: recipeData.prepTime || null,
+          cookTime: recipeData.cookTime || null,
+          totalTime: recipeData.totalTime || null,
+          servings: recipeData.servings || null,
+          cuisine: recipeData.cuisine || null,
+          sourceUrl: sourceUrl,
+        })
+        .returning();
+
+      if (!savedRecipe) {
+        throw new Error('Failed to create recipe');
+      }
 
       // 2. Insert ingredient groups and ingredients
-      for (let groupIndex = 0; groupIndex < recipeData.ingredients.length; groupIndex++) {
+      for (
+        let groupIndex = 0;
+        groupIndex < recipeData.ingredients.length;
+        groupIndex++
+      ) {
         const ingredientGroup = recipeData.ingredients[groupIndex];
-        
-        const [savedGroup] = await tx.insert(recipeIngredientGroups).values({
-          recipeId: savedRecipe.id,
-          name: ingredientGroup.name || null,
-          sortOrder: groupIndex,
-        }).returning();
+
+        if (!ingredientGroup) continue;
+
+        const [savedGroup] = await tx
+          .insert(recipeIngredientGroups)
+          .values({
+            recipeId: savedRecipe.id,
+            name: ingredientGroup.name || null,
+            sortOrder: groupIndex,
+          })
+          .returning();
+
+        if (!savedGroup) {
+          throw new Error('Failed to create ingredient group');
+        }
 
         // Insert ingredients for this group
-        for (let itemIndex = 0; itemIndex < ingredientGroup.items.length; itemIndex++) {
-          await tx.insert(recipeIngredients).values({
-            groupId: savedGroup.id,
-            ingredient: ingredientGroup.items[itemIndex],
-            sortOrder: itemIndex,
-          });
+        for (
+          let itemIndex = 0;
+          itemIndex < ingredientGroup.items.length;
+          itemIndex++
+        ) {
+          const ingredient = ingredientGroup.items[itemIndex];
+          if (ingredient) {
+            await tx.insert(recipeIngredients).values({
+              groupId: savedGroup.id,
+              ingredient: ingredient,
+              sortOrder: itemIndex,
+            });
+          }
         }
       }
 
       // 3. Insert instructions
-      for (let stepIndex = 0; stepIndex < recipeData.instructions.length; stepIndex++) {
-        await tx.insert(recipeInstructions).values({
-          recipeId: savedRecipe.id,
-          instruction: recipeData.instructions[stepIndex],
-          stepNumber: stepIndex + 1,
-        });
+      for (
+        let stepIndex = 0;
+        stepIndex < recipeData.instructions.length;
+        stepIndex++
+      ) {
+        const instruction = recipeData.instructions[stepIndex];
+        if (instruction) {
+          await tx.insert(recipeInstructions).values({
+            recipeId: savedRecipe.id,
+            instruction: instruction,
+            stepNumber: stepIndex + 1,
+          });
+        }
       }
 
       // 4. Insert notes (if any)
       if (recipeData.notes && recipeData.notes.length > 0) {
-        for (let noteIndex = 0; noteIndex < recipeData.notes.length; noteIndex++) {
-          await tx.insert(recipeNotes).values({
-            recipeId: savedRecipe.id,
-            note: recipeData.notes[noteIndex],
-            sortOrder: noteIndex,
-          });
+        for (
+          let noteIndex = 0;
+          noteIndex < recipeData.notes.length;
+          noteIndex++
+        ) {
+          const note = recipeData.notes[noteIndex];
+          if (note) {
+            await tx.insert(recipeNotes).values({
+              recipeId: savedRecipe.id,
+              note: note,
+              sortOrder: noteIndex,
+            });
+          }
         }
       }
 
@@ -168,6 +220,98 @@ class RecipeService {
         id: savedRecipe.id,
       };
     });
+  }
+
+  async getAllRecipes() {
+    const db = await getDb();
+
+    // Use Drizzle's query API to get recipes with all related data
+    const recipesWithData = await db.query.recipes.findMany({
+      with: {
+        ingredientGroups: {
+          with: {
+            ingredients: true,
+          },
+          orderBy: (groups, { asc }) => [asc(groups.sortOrder)],
+        },
+        instructions: {
+          orderBy: (instructions, { asc }) => [asc(instructions.stepNumber)],
+        },
+        notes: {
+          orderBy: (notes, { asc }) => [asc(notes.sortOrder)],
+        },
+      },
+      orderBy: (recipes, { desc }) => [desc(recipes.createdAt)],
+    });
+
+    // Transform the data to match RecipeData interface
+    return recipesWithData.map((recipe) => ({
+      id: recipe.id,
+      name: recipe.name,
+      prepTime: recipe.prepTime,
+      cookTime: recipe.cookTime,
+      totalTime: recipe.totalTime,
+      servings: recipe.servings,
+      cuisine: recipe.cuisine,
+      ingredients: recipe.ingredientGroups.map((group) => ({
+        name: group.name,
+        items: group.ingredients
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((ingredient) => ingredient.ingredient),
+      })),
+      instructions: recipe.instructions.map(
+        (instruction) => instruction.instruction
+      ),
+      notes: recipe.notes.map((note) => note.note),
+    }));
+  }
+
+  async getRecipeById(id: number) {
+    const db = await getDb();
+
+    // Use Drizzle's query API to get a single recipe with all related data
+    const recipe = await db.query.recipes.findFirst({
+      where: (recipes, { eq }) => eq(recipes.id, id),
+      with: {
+        ingredientGroups: {
+          with: {
+            ingredients: true,
+          },
+          orderBy: (groups, { asc }) => [asc(groups.sortOrder)],
+        },
+        instructions: {
+          orderBy: (instructions, { asc }) => [asc(instructions.stepNumber)],
+        },
+        notes: {
+          orderBy: (notes, { asc }) => [asc(notes.sortOrder)],
+        },
+      },
+    });
+
+    if (!recipe) {
+      return null;
+    }
+
+    // Transform the data to match RecipeData interface
+    return {
+      id: recipe.id,
+      name: recipe.name,
+      prepTime: recipe.prepTime,
+      cookTime: recipe.cookTime,
+      totalTime: recipe.totalTime,
+      servings: recipe.servings,
+      cuisine: recipe.cuisine,
+      ingredients: recipe.ingredientGroups.map((group) => ({
+        name: group.name,
+        items: group.ingredients
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((ingredient) => ingredient.ingredient),
+      })),
+      instructions: recipe.instructions.map(
+        (instruction) => instruction.instruction
+      ),
+      notes: recipe.notes.map((note) => note.note),
+    };
   }
 }
 

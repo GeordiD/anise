@@ -1,4 +1,5 @@
 import { pgTable, serial, text, timestamp, integer, decimal, foreignKey } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -87,5 +88,49 @@ export const tokenUsage = pgTable('token_usage', {
   recipeReference: foreignKey({
     columns: [table.recipeId],
     foreignColumns: [recipes.id],
+  }),
+}));
+
+// Relations
+export const recipesRelations = relations(recipes, ({ many, one }) => ({
+  ingredientGroups: many(recipeIngredientGroups),
+  instructions: many(recipeInstructions),
+  notes: many(recipeNotes),
+  tokenUsage: one(tokenUsage),
+}));
+
+export const recipeIngredientGroupsRelations = relations(recipeIngredientGroups, ({ one, many }) => ({
+  recipe: one(recipes, {
+    fields: [recipeIngredientGroups.recipeId],
+    references: [recipes.id],
+  }),
+  ingredients: many(recipeIngredients),
+}));
+
+export const recipeIngredientsRelations = relations(recipeIngredients, ({ one }) => ({
+  group: one(recipeIngredientGroups, {
+    fields: [recipeIngredients.groupId],
+    references: [recipeIngredientGroups.id],
+  }),
+}));
+
+export const recipeInstructionsRelations = relations(recipeInstructions, ({ one }) => ({
+  recipe: one(recipes, {
+    fields: [recipeInstructions.recipeId],
+    references: [recipes.id],
+  }),
+}));
+
+export const recipeNotesRelations = relations(recipeNotes, ({ one }) => ({
+  recipe: one(recipes, {
+    fields: [recipeNotes.recipeId],
+    references: [recipes.id],
+  }),
+}));
+
+export const tokenUsageRelations = relations(tokenUsage, ({ one }) => ({
+  recipe: one(recipes, {
+    fields: [tokenUsage.recipeId],
+    references: [recipes.id],
   }),
 }));

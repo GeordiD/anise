@@ -32,6 +32,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Server API**: Nuxt server routes in `server/api/` directory
 - **Example endpoint**: `server/api/users.get.ts` demonstrates basic database queries
+- When creating a `defineRouteMeta()` swagger config, don't worry about defining the responses -- that's too much information to manage.
 
 ### Frontend
 
