@@ -53,3 +53,12 @@ This project uses `pnpm` as the package manager. Always use `pnpm` commands inst
 ## Development Workflow
 
 - When making changes to code, ALWAYS run `pnpm run lint` and `pnpm run typecheck` afterwards to ensure you're code is matching our style and typing systems.
+
+## Vue Development
+
+- When writing vue components, always use `<script setup lang="ts">`
+- When writing vue components, put the script section above the template section
+
+## Project Structure
+
+- Most frontend folders/files should be put in the `/app/` folder
