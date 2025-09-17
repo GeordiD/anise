@@ -7,8 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Tech stack
 
 - Nuxt 4 (full-stack Vue 3 + TypeScript)
-- Drizzle ORM with PGlite for local development
-  - designed to eventually support PostgreSQL in production
+- Drizzle ORM with Postgres for local development
 
 ## Development Commands
 

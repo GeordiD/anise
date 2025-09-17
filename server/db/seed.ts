@@ -1,7 +1,7 @@
 import * as schema from './schema'
-import type { PgliteDatabase } from 'drizzle-orm/pglite'
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 
-export async function seedDatabase(db: PgliteDatabase<typeof schema>) {
+export async function seedDatabase(db: PostgresJsDatabase<typeof schema>) {
   // Check if users already exist
   const existingUsers = await db.select().from(schema.users).limit(1)
   if (existingUsers.length > 0) {
