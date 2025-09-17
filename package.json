@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "start": "node .output/server/index.mjs",
     "typecheck": "nuxt typecheck",
     "lint": "eslint .",
     "generate": "nuxt generate",
@@ -34,5 +35,11 @@
   "devDependencies": {
     "drizzle-kit": "^0.31.4",
     "tailwindcss": "^4.1.12"
+  },
+  "pnpm": {
+    "supportedArchitectures": {
+      "os": ["linux"],
+      "cpu": ["x64"]
+    }
   }
 }
