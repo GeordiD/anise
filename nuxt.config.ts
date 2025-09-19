@@ -8,5 +8,12 @@ export default defineNuxtConfig({
     experimental: {
       openAPI: true,
     },
+    openAPI: {
+      ui: {
+        scalar:
+          process.env.NODE_ENV !== 'production' ||
+          process.env.ENABLE_SWAGGER === 'true',
+      },
+    },
   },
 });
