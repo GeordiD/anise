@@ -16,8 +16,8 @@ const showBackButton = computed(() => route.path !== '/');
             v-if="showBackButton"
             variant="ghost"
             icon="i-heroicons-arrow-left"
-            @click="$router.back()"
             class="lg:hidden"
+            @click="$router.back()"
           />
           <!-- App Title -->
           <NuxtLink
@@ -26,6 +26,13 @@ const showBackButton = computed(() => route.path !== '/');
           >
             Anise
           </NuxtLink>
+          <!-- Add Recipe Link -->
+          <NuxtLink
+            to="/add-recipe"
+            class="text-sm font-medium text-gray-600 hover:text-gray-900 hidden sm:block"
+          >
+            Add Recipe
+          </NuxtLink>
         </div>
 
         <!-- Desktop Back Button -->
@@ -33,8 +40,8 @@ const showBackButton = computed(() => route.path !== '/');
           v-if="showBackButton"
           variant="ghost"
           icon="i-heroicons-arrow-left"
-          @click="$router.back()"
           class="hidden lg:flex"
+          @click="$router.back()"
         >
           Back
         </UButton>
