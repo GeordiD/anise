@@ -1,4 +1,9 @@
-import { recipeService } from '../../services/recipeService';
+import { recipeService, type Recipe } from '../../services/recipeService';
+
+export type RecipesResponse = {
+  success: boolean;
+  recipes: Recipe[];
+};
 
 export default defineEventHandler(async () => {
   const recipes = await recipeService.getAllRecipes();

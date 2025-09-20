@@ -1,5 +1,15 @@
 import { getDb } from '../db';
 
+export type Recipe = {
+  id: number;
+  name: string;
+  prepTime: string | null;
+  cookTime: string | null;
+  totalTime: string | null;
+  servings: string | null;
+  cuisine: string | null;
+};
+
 class RecipeService {
   async getAllRecipes() {
     const db = await getDb();
