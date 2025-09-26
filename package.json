@@ -17,6 +17,7 @@
     "@nuxt/eslint": "1.7.1",
     "@nuxt/test-utils": "3.19.2",
     "@nuxt/ui": "3.3.0",
+    "@nuxtjs/color-mode": "^3.5.2",
     "@tanstack/vue-query": "^5.85.3",
     "@tanstack/vue-table": "^8.21.3",
     "@types/pg": "^8.15.5",
@@ -38,8 +39,12 @@
   },
   "pnpm": {
     "supportedArchitectures": {
-      "os": ["linux"],
-      "cpu": ["x64"]
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "x64"
+      ]
     }
   }
 }

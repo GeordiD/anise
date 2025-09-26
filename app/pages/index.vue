@@ -17,18 +17,18 @@ const recipes = computed(() => recipesData.value?.recipes || []);
 
     <!-- Loading state -->
     <div v-if="pending" class="flex justify-center py-12">
-      <div class="text-gray-600">Loading recipes...</div>
+      <div class="text-gray-600 dark:text-gray-400">Loading recipes...</div>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="text-red-600 py-12 text-center">
+    <div v-else-if="error" class="text-red-600 dark:text-red-400 py-12 text-center">
       <p>Failed to load recipes. Please try again later.</p>
     </div>
 
     <!-- Empty state -->
     <div
       v-else-if="recipes.length === 0"
-      class="text-gray-600 py-12 text-center"
+      class="text-gray-600 dark:text-gray-400 py-12 text-center"
     >
       <p>No recipes found.</p>
     </div>

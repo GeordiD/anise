@@ -11,7 +11,7 @@ export type Recipe = {
 };
 
 class RecipeService {
-  async getAllRecipes() {
+  async getAllRecipes(): Promise<Recipe[]> {
     const db = await getDb();
 
     // Use Drizzle's query API to get recipes with all related data

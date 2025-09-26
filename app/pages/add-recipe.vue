@@ -75,7 +75,7 @@ const handleSubmit = async () => {
       <UCard>
         <form class="space-y-4" @submit.prevent="handleSubmit">
           <div>
-            <label for="recipe-url" class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="recipe-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Recipe URL
             </label>
             <UInput
@@ -123,8 +123,8 @@ const handleSubmit = async () => {
       />
 
       <!-- Instructions -->
-      <UCard class="bg-blue-50 border-blue-200">
-        <div class="text-sm text-blue-800">
+      <UCard class="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700">
+        <div class="text-sm text-blue-800 dark:text-blue-200">
           <h3 class="font-medium mb-2">How to add a recipe:</h3>
           <ol class="list-decimal list-inside space-y-1">
             <li>Copy the URL of a recipe from any cooking website</li>
