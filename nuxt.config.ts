@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/test-utils', '@nuxt/ui', '@nuxtjs/color-mode'],
+  modules: ['@nuxt/eslint', '@nuxt/test-utils', '@nuxt/ui', '@nuxtjs/color-mode', '@nuxt/icon'],
   css: ['~/assets/css/main.css'],
   colorMode: {
     preference: 'system', // default value of $colorMode.preference
