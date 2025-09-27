@@ -30,7 +30,11 @@ const toggleColorMode = () => {
             to="/add-recipe"
             class="text-sm font-medium text-muted hover:text-default hidden sm:block"
           >
-            +
+            <UButton
+              variant="ghost"
+              icon="i-heroicons-plus"
+              class="text-muted"
+            />
           </NuxtLink>
 
           <!-- Color Mode Toggle -->
