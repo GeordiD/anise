@@ -52,6 +52,8 @@ This project uses `pnpm` as the package manager. Always use `pnpm` commands inst
 ## Development Workflow
 
 - When making changes to code, ALWAYS run `pnpm run lint` and `pnpm run typecheck` afterwards to ensure you're code is matching our style and typing systems.
+- Don't run the development server yourself. Assume the dev server is already running on localhost:3000
+- When needed, use playwright mcp server to check your work to make sure what you've done looks good. Be sure to check both light and dark mode (using the toggle in the nav bar)
 
 ## Vue Development
 
@@ -65,6 +67,7 @@ This project uses `pnpm` as the package manager. Always use `pnpm` commands inst
 This project uses **Nuxt UI semantic color classes** that automatically handle light/dark mode transitions. Use these instead of manual `dark:` variants:
 
 #### Text Colors (Recommended Usage)
+
 - `text-default` - Primary text (headings, main content)
 - `text-toned` - Secondary text (labels, descriptions)
 - `text-muted` - Tertiary text (placeholders, loading states)
@@ -73,6 +76,7 @@ This project uses **Nuxt UI semantic color classes** that automatically handle l
 - `text-inverted` - Inverted text
 
 #### Semantic State Colors
+
 - `text-primary` - Primary brand color
 - `text-secondary` - Secondary brand color
 - `text-success` - Success states
@@ -81,6 +85,7 @@ This project uses **Nuxt UI semantic color classes** that automatically handle l
 - `text-error` - Error states
 
 #### Background and Other Colors
+
 - For non-text elements, use Nuxt UI's semantic classes: `primary`, `secondary`, `success`, `info`, `warning`, `error`, `neutral`
 - These work with component props (e.g., `<UButton color="primary">`) and utility classes (e.g., `bg-primary-50`)
 
@@ -94,6 +99,7 @@ This project uses **Nuxt UI semantic color classes** that automatically handle l
 ### ❌ Avoid Manual Dark Mode Classes
 
 Don't use manual `dark:` variants for text:
+
 ```vue
 <!-- ❌ Don't do this -->
 <h1 class="text-gray-900 dark:text-gray-100">Title</h1>
