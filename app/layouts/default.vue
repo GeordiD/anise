@@ -12,9 +12,9 @@ const toggleColorMode = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-default">
     <!-- Navigation Bar -->
-    <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+    <nav class="bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 px-4 py-3">
       <div class="max-w-4xl mx-auto flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <!-- Back Button (conditionally shown) -->
@@ -28,14 +28,14 @@ const toggleColorMode = () => {
           <!-- App Title -->
           <NuxtLink
             to="/"
-            class="text-xl font-semibold text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300"
+            class="text-xl font-semibold text-default hover:text-toned"
           >
             Anise
           </NuxtLink>
           <!-- Add Recipe Link -->
           <NuxtLink
             to="/add-recipe"
-            class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hidden sm:block"
+            class="text-sm font-medium text-muted hover:text-default hidden sm:block"
           >
             Add Recipe
           </NuxtLink>
@@ -46,7 +46,7 @@ const toggleColorMode = () => {
           <UButton
             variant="ghost"
             :icon="colorMode.value === 'dark' ? 'i-heroicons-sun' : 'i-heroicons-moon'"
-            class="text-gray-600 dark:text-gray-400"
+            class="text-muted"
             @click="toggleColorMode"
           />
 
