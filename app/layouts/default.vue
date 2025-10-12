@@ -1,10 +1,15 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { isVisible: isNavVisible } = useNavBarScrollDetector();
+</script>
 
 <template>
   <div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-default">
     <!-- Navigation Bar -->
     <nav
-      class="bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 px-4 py-3"
+      :class="[
+        'h-14 fixed top-0 left-0 right-0 z-50 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 px-4 py-3 transition-transform duration-300',
+        isNavVisible ? 'translate-y-0' : '-translate-y-full',
+      ]"
     >
       <div class="max-w-4xl mx-auto flex items-center justify-between">
         <div class="flex items-center space-x-4">
@@ -21,7 +26,7 @@
           <!-- Add Recipe Link -->
           <NuxtLink
             to="/add-recipe"
-            class="text-sm font-medium text-muted hover:text-default hidden sm:block"
+            class="text-sm font-medium text-muted hover:text-default"
           >
             <UButton
               variant="ghost"
@@ -36,8 +41,11 @@
       </div>
     </nav>
 
+    <!-- Nav bar placeholder (should match nav height) -->
+    <div class="h-14 invisible" />
+
     <!-- Main Content -->
-    <main class="max-w-4xl mx-auto px-4 py-6">
+    <main class="max-w-4xl mx-auto p-6">
       <slot />
     </main>
   </div>
