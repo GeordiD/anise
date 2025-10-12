@@ -12,7 +12,7 @@ const recipes = computed(() => recipesData.value?.recipes || []);
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto p-6">
+  <div class="max-w-6xl mx-auto">
     <h1 class="text-3xl font-bold mb-8">Recipes</h1>
 
     <!-- Loading state -->
@@ -26,10 +26,7 @@ const recipes = computed(() => recipesData.value?.recipes || []);
     </div>
 
     <!-- Empty state -->
-    <div
-      v-else-if="recipes.length === 0"
-      class="text-muted py-12 text-center"
-    >
+    <div v-else-if="recipes.length === 0" class="text-muted py-12 text-center">
       <p>No recipes found.</p>
     </div>
 
