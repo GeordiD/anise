@@ -31,33 +31,36 @@ export type GetRecipeByIdResponse = {
   ingredients: IngredientGroup[];
   instructions: string[];
   notes: string[];
+  sourceUrl: string;
 };
 
-export default defineEventHandler(async (event) => {
-  const parsedParams = paramInput.safeParse({
-    id: getRouterParam(event, 'id'),
-  });
-
-  if (!parsedParams.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage:
-        parsedParams.error.issues[0]?.message || 'Invalid recipe ID',
+export default defineEventHandler(
+  async (event): Promise<GetRecipeByIdResponse> => {
+    const parsedParams = paramInput.safeParse({
+      id: getRouterParam(event, 'id'),
     });
+
+    if (!parsedParams.success) {
+      throw createError({
+        statusCode: 400,
+        statusMessage:
+          parsedParams.error.issues[0]?.message || 'Invalid recipe ID',
+      });
+    }
+
+    const { id } = parsedParams.data;
+    const recipe = await recipeService.getRecipeById(id);
+
+    if (!recipe) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Recipe not found',
+      });
+    }
+
+    return recipe;
   }
-
-  const { id } = parsedParams.data;
-  const recipe = await recipeService.getRecipeById(id);
-
-  if (!recipe) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Recipe not found',
-    });
-  }
-
-  return recipe;
-});
+);
 
 defineRouteMeta({
   openAPI: {

@@ -76,6 +76,7 @@ class RecipeService {
         (instruction) => instruction.instruction
       ),
       notes: recipe.notes.map((note) => note.note),
+      sourceUrl: recipe.sourceUrl,
     };
   }
 }
