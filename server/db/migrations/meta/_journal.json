@@ -8,6 +8,13 @@
       "when": 1758069779876,
       "tag": "0000_orange_wolfsbane",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761427713787,
+      "tag": "0001_smooth_amphibian",
+      "breakpoints": true
     }
   ]
 }

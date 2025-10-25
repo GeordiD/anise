@@ -1,4 +1,6 @@
+import { eq } from 'drizzle-orm';
 import { getDb } from '../db';
+import { recipes } from '../db/schema';
 
 export type Recipe = {
   id: number;
@@ -16,6 +18,7 @@ class RecipeService {
 
     // Use Drizzle's query API to get recipes with all related data
     const recipesWithData = await db.query.recipes.findMany({
+      where: (recipes, { isNull }) => isNull(recipes.deletedAt),
       orderBy: (recipes, { desc }) => [desc(recipes.createdAt)],
     });
 
@@ -36,7 +39,8 @@ class RecipeService {
 
     // Use Drizzle's query API to get a single recipe with all related data
     const recipe = await db.query.recipes.findFirst({
-      where: (recipes, { eq }) => eq(recipes.id, id),
+      where: (recipes, { eq, isNull, and }) =>
+        and(eq(recipes.id, id), isNull(recipes.deletedAt)),
       with: {
         ingredientGroups: {
           with: {
@@ -78,6 +82,19 @@ class RecipeService {
       notes: recipe.notes.map((note) => note.note),
       sourceUrl: recipe.sourceUrl,
     };
+  }
+
+  async softDeleteRecipe(id: number): Promise<boolean> {
+    const db = await getDb();
+
+    // Update the recipe's deletedAt timestamp
+    const result = await db
+      .update(recipes)
+      .set({ deletedAt: new Date() })
+      .where(eq(recipes.id, id))
+      .returning();
+
+    return result.length > 0;
   }
 }
 

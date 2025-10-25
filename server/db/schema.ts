@@ -20,6 +20,7 @@ export const recipes = pgTable('recipes', {
   sourceUrl: text('source_url').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
 });
 
 export const recipeIngredientGroups = pgTable('recipe_ingredient_groups', {
