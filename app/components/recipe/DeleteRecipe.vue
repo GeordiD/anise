@@ -51,9 +51,6 @@ const handleDelete = async () => {
       >
       <UButton color="error" size="lg" @click="handleDelete">Yes</UButton>
     </div>
-    <div v-if="isDeleting">
-      <NuxtLoadingIndicator />
-    </div>
   </div>
 </template>
 
