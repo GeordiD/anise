@@ -10,20 +10,37 @@ const activeTab = ref<'ingredients' | 'instructions'>('ingredients');
 
 <template>
   <div>
-    <div class="flex flex-col gap-4 pb-16">
+    <div class="flex flex-col gap-4 pb-16 lg:pb-4">
       <recipe-header :recipe="recipe" />
 
       <hr />
 
-      <recipe-ingredients v-if="activeTab === 'ingredients'" :recipe="recipe" />
+      <!-- Mobile: Tab-based layout -->
+      <div class="lg:hidden">
+        <recipe-ingredients v-if="activeTab === 'ingredients'" :recipe="recipe" />
+        <recipe-instructions
+          v-if="activeTab === 'instructions'"
+          :recipe="recipe"
+        />
+      </div>
 
-      <recipe-instructions
-        v-if="activeTab === 'instructions'"
-        :recipe="recipe"
-      />
+      <!-- Desktop: Two-column layout -->
+      <div class="hidden lg:grid lg:grid-cols-2 lg:gap-8">
+        <recipe-ingredients :recipe="recipe" />
+        <div class="flex flex-col gap-4">
+          <recipe-instructions :recipe="recipe" />
+          <recipe-notes :recipe="recipe" />
+        </div>
+      </div>
 
-      <recipe-notes :recipe="recipe" />
+      <!-- Mobile: Notes at bottom -->
+      <div class="lg:hidden">
+        <recipe-notes :recipe="recipe" />
+      </div>
     </div>
-    <recipe-bottom-nav v-model="activeTab" />
+    <!-- Bottom nav only visible on mobile -->
+    <div class="lg:hidden">
+      <recipe-bottom-nav v-model="activeTab" />
+    </div>
   </div>
 </template>
