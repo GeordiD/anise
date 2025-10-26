@@ -15,6 +15,13 @@
       "when": 1761427713787,
       "tag": "0001_smooth_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761515237616,
+      "tag": "0002_ordinary_joseph",
+      "breakpoints": true
     }
   ]
 }
