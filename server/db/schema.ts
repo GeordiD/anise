@@ -1,5 +1,14 @@
-import { pgTable, serial, text, timestamp, integer, decimal, foreignKey } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import {
+  boolean,
+  decimal,
+  foreignKey,
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -23,74 +32,110 @@ export const recipes = pgTable('recipes', {
   deletedAt: timestamp('deleted_at'),
 });
 
-export const recipeIngredientGroups = pgTable('recipe_ingredient_groups', {
-  id: serial('id').primaryKey(),
-  recipeId: integer('recipe_id').notNull(),
-  name: text('name'), // Optional group name
-  sortOrder: integer('sort_order').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (table) => ({
-  recipeReference: foreignKey({
-    columns: [table.recipeId],
-    foreignColumns: [recipes.id],
-  }),
-}));
+export const recipeIngredientGroups = pgTable(
+  'recipe_ingredient_groups',
+  {
+    id: serial('id').primaryKey(),
+    recipeId: integer('recipe_id').notNull(),
+    name: text('name'), // Optional group name
+    sortOrder: integer('sort_order').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    recipeReference: foreignKey({
+      columns: [table.recipeId],
+      foreignColumns: [recipes.id],
+    }),
+  })
+);
 
-export const recipeIngredients = pgTable('recipe_ingredients', {
-  id: serial('id').primaryKey(),
-  groupId: integer('group_id').notNull(),
-  ingredient: text('ingredient').notNull(),
-  sortOrder: integer('sort_order').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (table) => ({
-  groupReference: foreignKey({
-    columns: [table.groupId],
-    foreignColumns: [recipeIngredientGroups.id],
-  }),
-}));
+export const recipeIngredients = pgTable(
+  'recipe_ingredients',
+  {
+    id: serial('id').primaryKey(),
+    groupId: integer('group_id').notNull(),
+    ingredient: text('ingredient').notNull(),
+    sortOrder: integer('sort_order').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    doNotUse: boolean('do_not_use').default(false),
+  },
+  (table) => ({
+    groupReference: foreignKey({
+      columns: [table.groupId],
+      foreignColumns: [recipeIngredientGroups.id],
+    }),
+  })
+);
 
-export const recipeInstructions = pgTable('recipe_instructions', {
-  id: serial('id').primaryKey(),
-  recipeId: integer('recipe_id').notNull(),
-  instruction: text('instruction').notNull(),
-  stepNumber: integer('step_number').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (table) => ({
-  recipeReference: foreignKey({
-    columns: [table.recipeId],
-    foreignColumns: [recipes.id],
-  }),
-}));
+export const recipeIngredientSubstitutions = pgTable(
+  'recipe_ingredient_substitutions',
+  {
+    id: serial('id').primaryKey(),
+    ingredientId: integer('ingredient_id').notNull(),
+    ingredient: text('ingredient').notNull(),
+  },
+  (table) => ({
+    ingredientReference: foreignKey({
+      columns: [table.ingredientId],
+      foreignColumns: [recipeIngredients.id],
+    }),
+  })
+);
 
-export const recipeNotes = pgTable('recipe_notes', {
-  id: serial('id').primaryKey(),
-  recipeId: integer('recipe_id').notNull(),
-  note: text('note').notNull(),
-  sortOrder: integer('sort_order').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (table) => ({
-  recipeReference: foreignKey({
-    columns: [table.recipeId],
-    foreignColumns: [recipes.id],
-  }),
-}));
+export const recipeInstructions = pgTable(
+  'recipe_instructions',
+  {
+    id: serial('id').primaryKey(),
+    recipeId: integer('recipe_id').notNull(),
+    instruction: text('instruction').notNull(),
+    stepNumber: integer('step_number').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    recipeReference: foreignKey({
+      columns: [table.recipeId],
+      foreignColumns: [recipes.id],
+    }),
+  })
+);
 
-export const tokenUsage = pgTable('token_usage', {
-  id: serial('id').primaryKey(),
-  recipeId: integer('recipe_id').notNull(),
-  inputTokens: integer('input_tokens').notNull(),
-  outputTokens: integer('output_tokens').notNull(),
-  totalTokens: integer('total_tokens').notNull(),
-  inputCost: decimal('input_cost', { precision: 10, scale: 6 }).notNull(),
-  outputCost: decimal('output_cost', { precision: 10, scale: 6 }).notNull(),
-  totalCost: decimal('total_cost', { precision: 10, scale: 6 }).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (table) => ({
-  recipeReference: foreignKey({
-    columns: [table.recipeId],
-    foreignColumns: [recipes.id],
-  }),
-}));
+export const recipeNotes = pgTable(
+  'recipe_notes',
+  {
+    id: serial('id').primaryKey(),
+    recipeId: integer('recipe_id').notNull(),
+    note: text('note').notNull(),
+    sortOrder: integer('sort_order').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    recipeReference: foreignKey({
+      columns: [table.recipeId],
+      foreignColumns: [recipes.id],
+    }),
+  })
+);
+
+export const tokenUsage = pgTable(
+  'token_usage',
+  {
+    id: serial('id').primaryKey(),
+    recipeId: integer('recipe_id').notNull(),
+    inputTokens: integer('input_tokens').notNull(),
+    outputTokens: integer('output_tokens').notNull(),
+    totalTokens: integer('total_tokens').notNull(),
+    inputCost: decimal('input_cost', { precision: 10, scale: 6 }).notNull(),
+    outputCost: decimal('output_cost', { precision: 10, scale: 6 }).notNull(),
+    totalCost: decimal('total_cost', { precision: 10, scale: 6 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    recipeReference: foreignKey({
+      columns: [table.recipeId],
+      foreignColumns: [recipes.id],
+    }),
+  })
+);
 
 // Relations
 export const recipesRelations = relations(recipes, ({ many, one }) => ({
@@ -100,27 +145,37 @@ export const recipesRelations = relations(recipes, ({ many, one }) => ({
   tokenUsage: one(tokenUsage),
 }));
 
-export const recipeIngredientGroupsRelations = relations(recipeIngredientGroups, ({ one, many }) => ({
-  recipe: one(recipes, {
-    fields: [recipeIngredientGroups.recipeId],
-    references: [recipes.id],
-  }),
-  ingredients: many(recipeIngredients),
-}));
+export const recipeIngredientGroupsRelations = relations(
+  recipeIngredientGroups,
+  ({ one, many }) => ({
+    recipe: one(recipes, {
+      fields: [recipeIngredientGroups.recipeId],
+      references: [recipes.id],
+    }),
+    ingredients: many(recipeIngredients),
+  })
+);
 
-export const recipeIngredientsRelations = relations(recipeIngredients, ({ one }) => ({
-  group: one(recipeIngredientGroups, {
-    fields: [recipeIngredients.groupId],
-    references: [recipeIngredientGroups.id],
-  }),
-}));
+export const recipeIngredientsRelations = relations(
+  recipeIngredients,
+  ({ one, many }) => ({
+    group: one(recipeIngredientGroups, {
+      fields: [recipeIngredients.groupId],
+      references: [recipeIngredientGroups.id],
+    }),
+    substitutions: many(recipeIngredientSubstitutions),
+  })
+);
 
-export const recipeInstructionsRelations = relations(recipeInstructions, ({ one }) => ({
-  recipe: one(recipes, {
-    fields: [recipeInstructions.recipeId],
-    references: [recipes.id],
-  }),
-}));
+export const recipeInstructionsRelations = relations(
+  recipeInstructions,
+  ({ one }) => ({
+    recipe: one(recipes, {
+      fields: [recipeInstructions.recipeId],
+      references: [recipes.id],
+    }),
+  })
+);
 
 export const recipeNotesRelations = relations(recipeNotes, ({ one }) => ({
   recipe: one(recipes, {
@@ -135,3 +190,13 @@ export const tokenUsageRelations = relations(tokenUsage, ({ one }) => ({
     references: [recipes.id],
   }),
 }));
+
+export const recipeIngredientSubstitutionsRelations = relations(
+  recipeIngredientSubstitutions,
+  ({ one }) => ({
+    ingredient: one(recipeIngredients, {
+      fields: [recipeIngredientSubstitutions.ingredientId],
+      references: [recipeIngredients.id],
+    }),
+  })
+);

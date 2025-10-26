@@ -44,7 +44,11 @@ class RecipeService {
       with: {
         ingredientGroups: {
           with: {
-            ingredients: true,
+            ingredients: {
+              with: {
+                substitutions: true,
+              },
+            },
           },
           orderBy: (groups, { asc }) => [asc(groups.sortOrder)],
         },
@@ -74,7 +78,13 @@ class RecipeService {
         name: group.name,
         items: group.ingredients
           .sort((a, b) => a.sortOrder - b.sortOrder)
-          .map((ingredient) => ingredient.ingredient),
+          .map((ingredient) => ({
+            name: ingredient.substitutions.length
+              ? ingredient.substitutions.at(0)?.ingredient
+              : ingredient.ingredient,
+            isSubstituted: !!ingredient.substitutions.length,
+            isUnused: !!ingredient.doNotUse,
+          })),
       })),
       instructions: recipe.instructions.map(
         (instruction) => instruction.instruction

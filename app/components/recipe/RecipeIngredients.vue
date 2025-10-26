@@ -22,16 +22,11 @@ defineProps<{
           {{ group.name }}
         </h3>
         <ul class="space-y-1">
-          <li
+          <recipe-ingredient
             v-for="(ingredient, itemIndex) in group.items"
             :key="itemIndex"
-            class="flex items-start"
-          >
-            <span
-              class="text-primary-600 dark:text-primary-400 mr-2 mt-1.5 w-1 h-1 bg-current rounded-full flex-shrink-0"
-            />
-            <span class="text-toned">{{ ingredient }}</span>
-          </li>
+            :ingredient="ingredient"
+          />
         </ul>
       </div>
     </div>

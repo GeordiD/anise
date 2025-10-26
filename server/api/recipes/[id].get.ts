@@ -15,24 +15,9 @@ const paramInput = z.object({
   }),
 });
 
-interface IngredientGroup {
-  name: string | null;
-  items: string[];
-}
-
-export type GetRecipeByIdResponse = {
-  id: number;
-  name: string;
-  prepTime: string | null;
-  cookTime: string | null;
-  totalTime: string | null;
-  servings: string | null;
-  cuisine: string | null;
-  ingredients: IngredientGroup[];
-  instructions: string[];
-  notes: string[];
-  sourceUrl: string;
-};
+export type GetRecipeByIdResponse = NonNullable<
+  Awaited<ReturnType<typeof recipeService.getRecipeById>>
+>;
 
 export default defineEventHandler(
   async (event): Promise<GetRecipeByIdResponse> => {
