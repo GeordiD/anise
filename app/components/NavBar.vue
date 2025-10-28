@@ -17,11 +17,7 @@ const { isVisible: isNavVisible } = useNavBarScrollDetector();
           to="/"
           class="hover:opacity-80 transition-opacity"
         >
-          <img
-            src="~/assets/images/heirloom-wordmark.svg"
-            alt="heirloom"
-            class="h-6 text-default"
-          />
+          <HeirloomWordmark class="h-6 text-gray-900 dark:text-white" />
         </NuxtLink>
       </div>
 
