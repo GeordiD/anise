@@ -15,9 +15,13 @@ const { isVisible: isNavVisible } = useNavBarScrollDetector();
         <!-- App Title -->
         <NuxtLink
           to="/"
-          class="text-xl font-semibold text-default hover:text-toned"
+          class="hover:opacity-80 transition-opacity"
         >
-          Anise
+          <img
+            src="~/assets/images/heirloom-wordmark.svg"
+            alt="heirloom"
+            class="h-6 text-default"
+          />
         </NuxtLink>
       </div>
 
