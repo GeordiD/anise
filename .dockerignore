@@ -1,0 +1,38 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+.output
+.nuxt
+dist
+.next
+
+# Development
+.git
+.github
+.vscode
+*.log
+
+# Local environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database
+data/
+*.sqlite
+*.db
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+README.md
+.editorconfig

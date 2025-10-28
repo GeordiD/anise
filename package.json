@@ -38,15 +38,5 @@
   "devDependencies": {
     "drizzle-kit": "^0.31.4",
     "tailwindcss": "^4.1.12"
-  },
-  "pnpm": {
-    "supportedArchitectures": {
-      "os": [
-        "linux"
-      ],
-      "cpu": [
-        "x64"
-      ]
-    }
   }
 }
