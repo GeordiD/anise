@@ -18,7 +18,7 @@ const { isVisible: isNavVisible } = useNavBarScrollDetector();
           class="hover:opacity-80 transition-opacity"
         >
           <img
-            src="~/assets/images/heirloom-wordmark.svg"
+            src="~/assets/images/Heirloom-Wordmark.svg"
             alt="heirloom"
             class="h-6 text-default"
           />
