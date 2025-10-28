@@ -21,7 +21,7 @@ defineProps<{
         >
           {{ group.name }}
         </h3>
-        <ul class="space-y-1">
+        <ul class="flex flex-col gap-2">
           <recipe-ingredient
             v-for="(ingredient, itemIndex) in group.items"
             :key="itemIndex"
