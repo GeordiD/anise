@@ -77,6 +77,15 @@ export default defineEventHandler(
       .delete(recipeIngredientSubstitutions)
       .where(eq(recipeIngredientSubstitutions.ingredientId, id));
 
+    // If the substitution matches the original ingredient text (trimmed),
+    // just delete the substitution and don't insert a new one
+    if (ingredient.trim() === existingIngredient.ingredient.trim()) {
+      return {
+        success: true,
+        message: 'Substitution removed (matched original)',
+      };
+    }
+
     // Insert new substitution
     await db.insert(recipeIngredientSubstitutions).values({
       ingredientId: id,
