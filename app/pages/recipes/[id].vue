@@ -9,7 +9,12 @@ const {
   data: recipe,
   pending,
   error,
+  refresh,
 } = await useFetch<GetRecipeByIdResponse>(`/api/recipes/${id}`);
+
+const handleIngredientUpdated = async () => {
+  await refresh();
+};
 </script>
 
 <template>
@@ -30,6 +35,10 @@ const {
     </div>
 
     <!-- Recipe content -->
-    <Recipe v-if="recipe" :recipe="recipe" />
+    <Recipe
+      v-if="recipe"
+      :recipe="recipe"
+      @ingredient-updated="handleIngredientUpdated"
+    />
   </div>
 </template>
