@@ -5,16 +5,7 @@ defineProps<{
   ingredient: GetRecipeByIdResponse['ingredients'][number]['items'][number];
 }>();
 
-const emit = defineEmits<{
-  ingredientUpdated: [ingredientId: number];
-}>();
-
 const isEditing = ref(false);
-
-const handleSaved = (ingredientId: number) => {
-  isEditing.value = false;
-  emit('ingredientUpdated', ingredientId);
-};
 </script>
 
 <template>
@@ -28,7 +19,6 @@ const handleSaved = (ingredientId: number) => {
       v-if="isEditing"
       :ingredient="ingredient"
       @close="isEditing = false"
-      @saved="handleSaved"
     />
   </Fragment>
 </template>

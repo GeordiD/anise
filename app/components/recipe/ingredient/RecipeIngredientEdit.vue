@@ -8,8 +8,10 @@ const { ingredient } = defineProps<{
 
 const emit = defineEmits<{
   close: [];
-  saved: [ingredientId: number];
 }>();
+
+const route = useRoute();
+const recipeId = route.params.id as string;
 
 const ingredientInput = ref(ingredient.name ?? '');
 const isSaving = ref(false);
@@ -35,7 +37,9 @@ const handleSave = async () => {
       }
     );
 
-    emit('saved', ingredient.id);
+    // Refresh the recipe data using Nuxt's cache invalidation
+    await refreshNuxtData(`recipe-${recipeId}`);
+
     emit('close');
   } catch (error: unknown) {
     const err = error as { data?: { statusMessage?: string } };

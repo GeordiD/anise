@@ -5,10 +5,6 @@ defineProps<{
   recipe: GetRecipeByIdResponse;
 }>();
 
-const emit = defineEmits<{
-  ingredientUpdated: [ingredientId: number];
-}>();
-
 const activeTab = ref<'ingredients' | 'instructions'>('ingredients');
 </script>
 
@@ -24,7 +20,6 @@ const activeTab = ref<'ingredients' | 'instructions'>('ingredients');
         <recipe-ingredients
           v-if="activeTab === 'ingredients'"
           :recipe="recipe"
-          @ingredient-updated="emit('ingredientUpdated', $event)"
         />
         <recipe-instructions
           v-if="activeTab === 'instructions'"
@@ -34,10 +29,7 @@ const activeTab = ref<'ingredients' | 'instructions'>('ingredients');
 
       <!-- Desktop: Two-column layout -->
       <div class="hidden lg:grid lg:grid-cols-2 lg:gap-8">
-        <recipe-ingredients
-          :recipe="recipe"
-          @ingredient-updated="emit('ingredientUpdated', $event)"
-        />
+        <recipe-ingredients :recipe="recipe" />
         <div class="flex flex-col gap-4">
           <recipe-instructions :recipe="recipe" />
           <recipe-notes :recipe="recipe" />

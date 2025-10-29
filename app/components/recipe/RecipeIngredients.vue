@@ -4,10 +4,6 @@ import type { GetRecipeByIdResponse } from '~~/server/api/recipes/[id].get';
 defineProps<{
   recipe: GetRecipeByIdResponse;
 }>();
-
-const emit = defineEmits<{
-  ingredientUpdated: [ingredientId: number];
-}>();
 </script>
 
 <template>
@@ -30,7 +26,6 @@ const emit = defineEmits<{
             v-for="(ingredient, itemIndex) in group.items"
             :key="itemIndex"
             :ingredient="ingredient"
-            @ingredient-updated="emit('ingredientUpdated', $event)"
           />
         </ul>
       </div>
