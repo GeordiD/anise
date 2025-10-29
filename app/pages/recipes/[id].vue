@@ -9,7 +9,9 @@ const {
   data: recipe,
   pending,
   error,
-} = await useFetch<GetRecipeByIdResponse>(`/api/recipes/${id}`);
+} = await useFetch<GetRecipeByIdResponse>(`/api/recipes/${id}`, {
+  key: `recipe-${id}`,
+});
 </script>
 
 <template>

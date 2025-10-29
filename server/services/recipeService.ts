@@ -79,6 +79,7 @@ class RecipeService {
         items: group.ingredients
           .sort((a, b) => a.sortOrder - b.sortOrder)
           .map((ingredient) => ({
+            id: ingredient.id,
             name: ingredient.substitutions.length
               ? ingredient.substitutions.at(0)?.ingredient
               : ingredient.ingredient,
