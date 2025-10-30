@@ -17,7 +17,10 @@ const activeTab = ref<'ingredients' | 'instructions'>('ingredients');
 
       <!-- Mobile: Tab-based layout -->
       <div class="lg:hidden">
-        <recipe-ingredients v-if="activeTab === 'ingredients'" :recipe="recipe" />
+        <recipe-ingredients
+          v-if="activeTab === 'ingredients'"
+          :recipe="recipe"
+        />
         <recipe-instructions
           v-if="activeTab === 'instructions'"
           :recipe="recipe"
