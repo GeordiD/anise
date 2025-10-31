@@ -22,6 +22,20 @@
       "when": 1761515237616,
       "tag": "0002_ordinary_joseph",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1761876896506,
+      "tag": "0003_boring_oracle",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1761877333427,
+      "tag": "0004_gorgeous_apocalypse",
+      "breakpoints": true
     }
   ]
 }
