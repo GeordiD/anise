@@ -1,2 +1,49 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
+
+@theme {
+  /* Custom Teal Primary Color Scale */
+  --color-teal-50: #f0faf9;
+  --color-teal-100: #c0efe8;
+  --color-teal-200: #83c4ba;
+  --color-teal-300: #5da9a0;
+  --color-teal-400: #388785;
+  --color-teal-500: #134f4d;
+  --color-teal-600: #104240;
+  --color-teal-700: #0d3534;
+  --color-teal-800: #0a2827;
+  --color-teal-900: #071b1a;
+  --color-teal-950: #040f0f;
+
+  /* Custom Warm Neutral Scale (using exact design system colors) */
+  --color-warm-50: #fffdf8;
+  --color-warm-100: #fcf7ed;
+  --color-warm-200: #f7f1e4;
+  --color-warm-300: #ebe4d3;
+  --color-warm-400: #dcd7cb;
+  --color-warm-500: #7e796a;
+  --color-warm-600: #6a6452;
+  --color-warm-700: #413c2a;
+  --color-warm-800: #332f22;
+  --color-warm-900: #2d2919;
+  --color-warm-950: #2a2412;
+}
+
+/* Custom CSS Variables for Semantic Usage */
+:root {
+  /* Light Mode */
+  --color-bg-primary: #fffdf8;
+  --color-bg-secondary: #f7f1e4;
+  --color-text-default: #413c2a;
+  --color-text-toned: #6a6452;
+  --color-border-thin: #dcd7cb;
+}
+
+.dark {
+  /* Dark Mode */
+  --color-bg-primary: #2a2412;
+  --color-bg-secondary: #413c2a;
+  --color-text-default: #fffdf8;
+  --color-text-toned: #fcf7ed;
+  --color-border-thin: #7e796a;
+}
