@@ -48,7 +48,6 @@ const handleDelete = async () => {
 <template>
   <li ref="ingredient" class="flex justify-between min-h-8">
     <div class="flex items-start">
-     
       <span
         :class="{
           'line-through': ingredient.isUnused,

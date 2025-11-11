@@ -84,7 +84,7 @@ This project uses **Nuxt UI semantic color classes** that automatically handle l
 #### Priamry Brand Colors
 
 - `basil-400` - primary brand color
-- `basil-300`
+- `basil-300` - secondary brand color
 - `basil-200`
 - `basil-100`
 
