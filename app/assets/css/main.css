@@ -12,11 +12,12 @@
   /* Custom Warm Neutral Scale*/
   --color-cream-100: #FFFDF8;
   --color-cream-200: #FDF8EF;
-  --color-cream-300: #DCD7CB;
-  --color-cream-400: #B4AEA1;
-  --color-cream-500: #6A6452;
-  --color-cream-600: #413C2A;
-  --color-cream-700: #2A2412;
+  --color-cream-300: #E8E3DB;
+  --color-cream-400: #B7B3AC;
+  --color-cream-500: #86837D;
+  --color-cream-600: #3E3C39;
+  --color-cream-700: #2A2825;
+  --color-cream-800: #22211E;
 }
 
 /* Override Nuxt UI neutral colors with warm palette */
@@ -36,8 +37,8 @@
   /* Custom CSS Variables for Semantic Usage */
   --ui-primary: var(--color-basil-400);
   --ui-secondary: var(--color-basil-300);
-  --ui-bg: var(--color-cream-700);
-  --ui-bg-muted: var(--color-cream-600);
+  --ui-bg: var(--color-cream-800);
+  --ui-bg-muted: var(--color-cream-700);
   --ui-text: var(--color-cream-100);
   --ui-text-inverted: var(--color-cream-600);
   --ui-text-muted: var(--color-cream-200);
