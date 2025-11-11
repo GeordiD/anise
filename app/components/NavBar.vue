@@ -30,6 +30,22 @@ const { isVisible: isNavVisible } = useNavBarScrollDetector();
           <UButton variant="ghost" icon="i-heroicons-plus" class="text-muted" />
         </NuxtLink>
 
+        <!-- Meal Plan Link -->
+        <NuxtLink
+          to="/meal-plan"
+          class="text-sm font-medium text-muted hover:text-default"
+        >
+          <UButton variant="ghost" icon="mdi:hamburger" class="text-muted" />
+        </NuxtLink>
+
+        <!-- Shopping List Link -->
+        <NuxtLink
+          to="/lists"
+          class="text-sm font-medium text-muted hover:text-default"
+        >
+          <UButton variant="ghost" icon="i-heroicons-shopping-cart" class="text-muted" />
+        </NuxtLink>
+
         <!-- Color Mode Toggle -->
         <ColorPicker />
       </div>

@@ -1,14 +1,20 @@
 import { relations } from 'drizzle-orm';
 import {
   boolean,
+  date,
   decimal,
   foreignKey,
   integer,
+  pgEnum,
   pgTable,
   serial,
   text,
   timestamp,
 } from 'drizzle-orm/pg-core';
+
+// Enums
+export const dayOfWeekEnum = pgEnum('day_of_week', ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']);
+export const mealTypeEnum = pgEnum('meal_type', ['lunch', 'dinner']);
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -45,7 +51,7 @@ export const recipeIngredientGroups = pgTable(
     recipeReference: foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -63,7 +69,7 @@ export const recipeIngredients = pgTable(
     groupReference: foreignKey({
       columns: [table.groupId],
       foreignColumns: [recipeIngredientGroups.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -78,7 +84,7 @@ export const recipeIngredientSubstitutions = pgTable(
     ingredientReference: foreignKey({
       columns: [table.ingredientId],
       foreignColumns: [recipeIngredients.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -95,7 +101,7 @@ export const recipeInstructions = pgTable(
     recipeReference: foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -112,7 +118,7 @@ export const recipeNotes = pgTable(
     recipeReference: foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -130,6 +136,85 @@ export const tokenUsage = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => ({
+    recipeReference: foreignKey({
+      columns: [table.recipeId],
+      foreignColumns: [recipes.id],
+    }).onDelete('cascade'),
+  })
+);
+
+export const mealPlans = pgTable(
+  'meal_plans',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id').notNull(),
+    weekStartDay: dayOfWeekEnum('week_start_day').notNull().default('sunday'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userReference: foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+    }).onDelete('cascade'),
+  })
+);
+
+export const mealPlanDays = pgTable(
+  'meal_plan_days',
+  {
+    id: serial('id').primaryKey(),
+    mealPlanId: integer('meal_plan_id').notNull(),
+    dayOfWeek: dayOfWeekEnum('day_of_week').notNull(),
+    date: date('date').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    mealPlanReference: foreignKey({
+      columns: [table.mealPlanId],
+      foreignColumns: [mealPlans.id],
+    }).onDelete('cascade'),
+  })
+);
+
+export const mealPlanMeals = pgTable(
+  'meal_plan_meals',
+  {
+    id: serial('id').primaryKey(),
+    dayId: integer('day_id').notNull(),
+    mealType: mealTypeEnum('meal_type').notNull(),
+    recipeId: integer('recipe_id').notNull(),
+    sortOrder: integer('sort_order').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    dayReference: foreignKey({
+      columns: [table.dayId],
+      foreignColumns: [mealPlanDays.id],
+    }).onDelete('cascade'),
+    recipeReference: foreignKey({
+      columns: [table.recipeId],
+      foreignColumns: [recipes.id],
+    }),
+  })
+);
+
+export const shoppingListItems = pgTable(
+  'shopping_list_items',
+  {
+    id: serial('id').primaryKey(),
+    mealPlanId: integer('meal_plan_id').notNull(),
+    recipeId: integer('recipe_id'),
+    ingredientText: text('ingredient_text').notNull(),
+    checked: boolean('checked').default(false).notNull(),
+    sortOrder: integer('sort_order').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    mealPlanReference: foreignKey({
+      columns: [table.mealPlanId],
+      foreignColumns: [mealPlans.id],
+    }).onDelete('cascade'),
     recipeReference: foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
@@ -200,3 +285,41 @@ export const recipeIngredientSubstitutionsRelations = relations(
     }),
   })
 );
+
+export const mealPlansRelations = relations(mealPlans, ({ one, many }) => ({
+  user: one(users, {
+    fields: [mealPlans.userId],
+    references: [users.id],
+  }),
+  days: many(mealPlanDays),
+}));
+
+export const mealPlanDaysRelations = relations(mealPlanDays, ({ one, many }) => ({
+  mealPlan: one(mealPlans, {
+    fields: [mealPlanDays.mealPlanId],
+    references: [mealPlans.id],
+  }),
+  meals: many(mealPlanMeals),
+}));
+
+export const mealPlanMealsRelations = relations(mealPlanMeals, ({ one }) => ({
+  day: one(mealPlanDays, {
+    fields: [mealPlanMeals.dayId],
+    references: [mealPlanDays.id],
+  }),
+  recipe: one(recipes, {
+    fields: [mealPlanMeals.recipeId],
+    references: [recipes.id],
+  }),
+}));
+
+export const shoppingListItemsRelations = relations(shoppingListItems, ({ one }) => ({
+  mealPlan: one(mealPlans, {
+    fields: [shoppingListItems.mealPlanId],
+    references: [mealPlans.id],
+  }),
+  recipe: one(recipes, {
+    fields: [shoppingListItems.recipeId],
+    references: [recipes.id],
+  }),
+}));
