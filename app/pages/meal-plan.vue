@@ -61,7 +61,7 @@ async function handleRemoveMeal(mealId: number) {
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="container mx-auto px-4 py-8 max-w-4xl pb-32">
     <div class="mb-8">
       <h1 class="text-4xl font-bold text-default mb-2">Meal Plan</h1>
       <p class="text-muted">Plan your meals for the week</p>
@@ -87,6 +87,19 @@ async function handleRemoveMeal(mealId: number) {
           :day="day"
           @select-meals="handleSelectRecipes"
           @remove-meal="handleRemoveMeal"
+        />
+      </div>
+    </div>
+
+    <!-- Fixed bottom action button -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 p-4">
+      <div class="container mx-auto max-w-4xl">
+        <UButton
+          to="/lists/create"
+          color="primary"
+          size="lg"
+          block
+          label="Create Shopping List"
         />
       </div>
     </div>

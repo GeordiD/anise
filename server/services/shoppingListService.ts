@@ -18,7 +18,7 @@ export type ShoppingList = {
 
 class ShoppingListService {
   /**
-   * Add items to the shopping list
+   * Add items to the shopping list (clears existing list first)
    */
   async addItems(
     userId: number,
@@ -46,13 +46,11 @@ class ShoppingListService {
       });
     }
 
-    // Get current max sort order
-    const existingItems = await db.query.shoppingListItems.findMany({
-      where: eq(shoppingListItems.mealPlanId, mealPlanId),
-      orderBy: (items, { desc }) => [desc(items.sortOrder)],
-    });
+    // Clear existing shopping list items for this meal plan
+    await db.delete(shoppingListItems).where(eq(shoppingListItems.mealPlanId, mealPlanId));
 
-    let sortOrder = existingItems.length > 0 && existingItems[0] ? existingItems[0].sortOrder + 1 : 0;
+    // Start sort order from 0
+    let sortOrder = 0;
 
     // Insert items
     const itemsToInsert = items.map((item) => ({
