@@ -223,6 +223,33 @@ class MealPlanService {
   }
 
   /**
+   * Clear all meals from the meal plan
+   */
+  async clearAllMeals(): Promise<void> {
+    const db = await getDb();
+
+    // Get the current meal plan
+    const mealPlan = await db.query.mealPlans.findFirst({
+      where: eq(mealPlans.userId, this.DEFAULT_USER_ID),
+      with: {
+        days: true,
+      },
+    });
+
+    if (!mealPlan) {
+      throw new Error('No meal plan found');
+    }
+
+    // Delete all meals from all days in this meal plan
+    const dayIds = mealPlan.days.map((day) => day.id);
+    if (dayIds.length > 0) {
+      for (const dayId of dayIds) {
+        await db.delete(mealPlanMeals).where(eq(mealPlanMeals.dayId, dayId));
+      }
+    }
+  }
+
+  /**
    * Update the week start day preference
    */
   async updateWeekStartDay(weekStartDay: DayOfWeek): Promise<void> {

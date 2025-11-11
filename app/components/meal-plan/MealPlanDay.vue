@@ -16,12 +16,6 @@ const dayName = computed(() => {
     props.day.dayOfWeek.charAt(0).toUpperCase() + props.day.dayOfWeek.slice(1)
   );
 });
-
-// Format date (e.g., "Dec 25" from "2024-12-25")
-const formattedDate = computed(() => {
-  const date = new Date(props.day.date);
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-});
 </script>
 
 <template>
@@ -30,9 +24,6 @@ const formattedDate = computed(() => {
       <h3 class="text-lg font-semibold text-default">
         {{ dayName }}
       </h3>
-      <p class="text-sm text-muted">
-        {{ formattedDate }}
-      </p>
     </div>
 
     <div class="space-y-4">

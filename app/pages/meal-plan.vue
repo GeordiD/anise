@@ -58,6 +58,21 @@ async function handleRemoveMeal(mealId: number) {
     // TODO: Show error toast
   }
 }
+
+// Clear all meals from the meal plan
+async function handleClearAll() {
+  try {
+    await $fetch('/api/meal-plan/meals', {
+      method: 'DELETE',
+    });
+
+    // Refresh the meal plan data
+    await refresh();
+  } catch (err) {
+    console.error('Failed to clear meals:', err);
+    // TODO: Show error toast
+  }
+}
 </script>
 
 <template>
@@ -91,16 +106,25 @@ async function handleRemoveMeal(mealId: number) {
       </div>
     </div>
 
-    <!-- Fixed bottom action button -->
+    <!-- Fixed bottom action buttons -->
     <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 p-4">
       <div class="container mx-auto max-w-4xl">
-        <UButton
-          to="/lists/create"
-          color="primary"
-          size="lg"
-          block
-          label="Create Shopping List"
-        />
+        <div class="flex gap-3">
+          <UButton
+            color="neutral"
+            size="lg"
+            variant="outline"
+            label="Clear All"
+            @click="handleClearAll"
+          />
+          <UButton
+            to="/lists/create"
+            color="primary"
+            size="lg"
+            block
+            label="Create Shopping List"
+          />
+        </div>
       </div>
     </div>
   </div>
