@@ -7,7 +7,7 @@ export default defineAppConfig({
       info: 'blue',         // Nuxt UI default
       warning: 'yellow',    // Nuxt UI default
       error: 'red',         // Nuxt UI default
-      neutral: 'warm'       // Custom warm neutral palette
+      neutral: 'stone'      // Base neutral (overridden with warm colors in CSS)
     }
   }
 })

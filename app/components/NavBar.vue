@@ -6,7 +6,7 @@ const { isVisible: isNavVisible } = useNavBarScrollDetector();
   <!-- Navigation Bar -->
   <nav
     :class="[
-      'h-14 fixed top-0 left-0 right-0 z-50 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 px-4 py-3 transition-transform duration-300',
+      'h-14 fixed top-0 left-0 right-0 z-50 bg-muted px-4 py-3 transition-transform duration-300',
       isNavVisible ? 'translate-y-0' : '-translate-y-full',
     ]"
   >
@@ -17,7 +17,7 @@ const { isVisible: isNavVisible } = useNavBarScrollDetector();
           to="/"
           class="hover:opacity-80 transition-opacity"
         >
-          <HeirloomWordmark class="h-6 text-gray-900 dark:text-white" />
+          <HeirloomWordmark class="h-6 text-default" />
         </NuxtLink>
       </div>
 
