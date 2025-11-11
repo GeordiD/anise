@@ -51,7 +51,7 @@ export const recipeIngredientGroups = pgTable(
     recipeReference: foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -69,7 +69,7 @@ export const recipeIngredients = pgTable(
     groupReference: foreignKey({
       columns: [table.groupId],
       foreignColumns: [recipeIngredientGroups.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -84,7 +84,7 @@ export const recipeIngredientSubstitutions = pgTable(
     ingredientReference: foreignKey({
       columns: [table.ingredientId],
       foreignColumns: [recipeIngredients.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -101,7 +101,7 @@ export const recipeInstructions = pgTable(
     recipeReference: foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -118,7 +118,7 @@ export const recipeNotes = pgTable(
     recipeReference: foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -139,7 +139,7 @@ export const tokenUsage = pgTable(
     recipeReference: foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -156,7 +156,7 @@ export const mealPlans = pgTable(
     userReference: foreignKey({
       columns: [table.userId],
       foreignColumns: [users.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -173,7 +173,7 @@ export const mealPlanDays = pgTable(
     mealPlanReference: foreignKey({
       columns: [table.mealPlanId],
       foreignColumns: [mealPlans.id],
-    }),
+    }).onDelete('cascade'),
   })
 );
 
@@ -191,7 +191,7 @@ export const mealPlanMeals = pgTable(
     dayReference: foreignKey({
       columns: [table.dayId],
       foreignColumns: [mealPlanDays.id],
-    }),
+    }).onDelete('cascade'),
     recipeReference: foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],

@@ -25,7 +25,7 @@ const formattedDate = computed(() => {
 </script>
 
 <template>
-  <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+  <div class="border-b border-neutral-200 dark:border-neutral-700 pb-4">
     <div class="mb-3">
       <h3 class="text-lg font-semibold text-default">
         {{ dayName }}
@@ -41,11 +41,8 @@ const formattedDate = computed(() => {
         :day-id="day.id"
         meal-type="lunch"
         :meals="day.lunch"
-        @select-meals="
-          (dayId, mealType, mealIds) =>
-            emit('selectMeals', dayId, mealType, mealIds)
-        "
-        @remove-meal="(mealId) => emit('removeMeal', mealId)"
+        @select-meals="(...args) => emit('selectMeals', ...args)"
+        @remove-meal="(...args) => emit('removeMeal', ...args)"
       />
 
       <!-- Dinner -->
@@ -53,11 +50,8 @@ const formattedDate = computed(() => {
         :day-id="day.id"
         meal-type="dinner"
         :meals="day.dinner"
-        @select-meals="
-          (dayId, mealType, mealIds) =>
-            emit('selectMeals', dayId, mealType, mealIds)
-        "
-        @remove-meal="(mealId) => emit('removeMeal', mealId)"
+        @select-meals="(...args) => emit('selectMeals', ...args)"
+        @remove-meal="(...args) => emit('removeMeal', ...args)"
       />
     </div>
   </div>

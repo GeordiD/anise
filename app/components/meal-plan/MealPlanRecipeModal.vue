@@ -35,23 +35,22 @@ function toggleRecipe(recipeId: number) {
 }
 
 function handleSelect() {
-  console.log('here2');
   emit('select', selectedRecipeIds.value);
-  selectedRecipeIds.value = [];
-  searchQuery.value = '';
+  emit('close', true);
 }
 
 function handleClose() {
+  emit('close', false);
+}
+
+function resetState() {
   selectedRecipeIds.value = [];
   searchQuery.value = '';
 }
 </script>
 
 <template>
-  <UModal
-    :close="{ onClick: () => emit('close', false) }"
-    @after:leave="handleClose"
-  >
+  <UModal :close="{ onClick: handleClose }" @after:leave="resetState">
     <template #content>
       <UCard>
         <template #header>
@@ -77,25 +76,27 @@ function handleClose() {
 
           <!-- Recipe list -->
           <div class="max-h-96 overflow-y-auto space-y-2">
-            <div
+            <UCard
               v-for="recipe in filteredRecipes"
               :key="recipe.id"
-              class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              class="cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
               @click="toggleRecipe(recipe.id)"
             >
-              <UCheckbox
-                :model-value="selectedRecipeIds.includes(recipe.id)"
-                @update:model-value="toggleRecipe(recipe.id)"
-              />
-              <div class="flex-1">
-                <div class="font-medium text-default">
-                  {{ recipe.name }}
-                </div>
-                <div v-if="recipe.cuisine" class="text-sm text-muted">
-                  {{ recipe.cuisine }}
+              <div class="flex items-center gap-3">
+                <UCheckbox
+                  :model-value="selectedRecipeIds.includes(recipe.id)"
+                  @update:model-value="toggleRecipe(recipe.id)"
+                />
+                <div class="flex-1">
+                  <div class="font-medium text-default">
+                    {{ recipe.name }}
+                  </div>
+                  <div v-if="recipe.cuisine" class="text-sm text-muted">
+                    {{ recipe.cuisine }}
+                  </div>
                 </div>
               </div>
-            </div>
+            </UCard>
 
             <!-- Empty state -->
             <div

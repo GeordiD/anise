@@ -53,7 +53,7 @@ This project uses `pnpm` as the package manager. Always use `pnpm` commands inst
 
 - When making changes to code, ALWAYS run `pnpm run lint` and `pnpm run typecheck` afterwards to ensure you're code is matching our style and typing systems.
 - Don't run the development server yourself. Assume the dev server is already running on localhost:3000
-- When needed, use playwright mcp server to check your work to make sure what you've done looks good. Be sure to check both light and dark mode (using the toggle in the nav bar)
+- When needed, ask me if you should use playwright mcp server to check your work to make sure what you've done looks good. Be sure to check both light and dark mode (using the toggle in the nav bar)
 
 ## Vue Development
 

@@ -53,7 +53,7 @@ const modal = overlay.create(MealPlanRecipeModal);
       <div
         v-for="meal in meals"
         :key="meal.id"
-        class="flex items-center justify-between bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded text-sm"
+        class="flex items-center justify-between bg-neutral-100 dark:bg-neutral-800 px-3 py-2 rounded text-sm"
       >
         <NuxtLink
           :to="`/recipes/${meal.recipeId}`"
