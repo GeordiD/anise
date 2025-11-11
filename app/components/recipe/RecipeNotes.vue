@@ -21,9 +21,6 @@ defineProps<{
           :key="index"
           class="flex items-start"
         >
-          <!-- <span
-            class="text-primary mr-2 mt-1.5 w-1 h-1 bg-current rounded-full flex-shrink-0"
-          /> -->
           <span class="text-default">{{ note }}</span>
         </li>
       </ul>

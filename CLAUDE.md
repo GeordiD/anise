@@ -69,10 +69,7 @@ This project uses **Nuxt UI semantic color classes** that automatically handle l
 #### Text Colors (Recommended Usage)
 
 - `text-default` - Primary text (headings, main content)
-- `text-toned` - Secondary text (labels, descriptions)
-- `text-muted` - Tertiary text (placeholders, loading states)
-- `text-dimmed` - Subtle text
-- `text-highlighted` - Emphasized text
+- `text-muted` - Secondary text (labels, descriptions)
 - `text-inverted` - Inverted text
 
 #### Semantic State Colors
@@ -84,10 +81,22 @@ This project uses **Nuxt UI semantic color classes** that automatically handle l
 - `text-warning` - Warning states
 - `text-error` - Error states
 
+#### Priamry Brand Colors
+
+- `basil-400` - primary brand color
+- `basil-300`
+- `basil-200`
+- `basil-100`
+
 #### Background and Other Colors
 
 - For non-text elements, use Nuxt UI's semantic classes: `primary`, `secondary`, `success`, `info`, `warning`, `error`, `neutral`
-- These work with component props (e.g., `<UButton color="primary">`) and utility classes (e.g., `bg-primary-50`)
+- These work with component props (e.g., `<UButton color="primary">`) and utility classes (e.g., `bg-primary`)
+
+- `bg-default` - Main background color for the app
+- `bg-muted` - Secondary background color (should be used for card placed on top of the background)
+
+- `border-default` - border color for all divider lines, and borders
 
 ### Dark Mode Implementation
 
