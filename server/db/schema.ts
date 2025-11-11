@@ -199,6 +199,29 @@ export const mealPlanMeals = pgTable(
   })
 );
 
+export const shoppingListItems = pgTable(
+  'shopping_list_items',
+  {
+    id: serial('id').primaryKey(),
+    mealPlanId: integer('meal_plan_id').notNull(),
+    recipeId: integer('recipe_id'),
+    ingredientText: text('ingredient_text').notNull(),
+    checked: boolean('checked').default(false).notNull(),
+    sortOrder: integer('sort_order').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    mealPlanReference: foreignKey({
+      columns: [table.mealPlanId],
+      foreignColumns: [mealPlans.id],
+    }).onDelete('cascade'),
+    recipeReference: foreignKey({
+      columns: [table.recipeId],
+      foreignColumns: [recipes.id],
+    }),
+  })
+);
+
 // Relations
 export const recipesRelations = relations(recipes, ({ many, one }) => ({
   ingredientGroups: many(recipeIngredientGroups),
@@ -286,6 +309,17 @@ export const mealPlanMealsRelations = relations(mealPlanMeals, ({ one }) => ({
   }),
   recipe: one(recipes, {
     fields: [mealPlanMeals.recipeId],
+    references: [recipes.id],
+  }),
+}));
+
+export const shoppingListItemsRelations = relations(shoppingListItems, ({ one }) => ({
+  mealPlan: one(mealPlans, {
+    fields: [shoppingListItems.mealPlanId],
+    references: [mealPlans.id],
+  }),
+  recipe: one(recipes, {
+    fields: [shoppingListItems.recipeId],
     references: [recipes.id],
   }),
 }));
