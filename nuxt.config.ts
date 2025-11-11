@@ -10,6 +10,11 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
   ],
   css: ['~/assets/css/main.css'],
+  ui: {
+    theme: {
+      colors: ['primary', 'secondary', 'success', 'info', 'warning', 'error', 'neutral', 'teal']
+    }
+  },
   colorMode: {
     preference: 'system', // default value of $colorMode.preference
     fallback: 'light', // fallback value if not system preference found

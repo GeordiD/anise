@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-default">
+  <div class="min-h-screen bg-default text-default">
     <NavBar />
 
     <!-- Main Content (default) -->

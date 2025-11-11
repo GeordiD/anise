@@ -16,11 +16,11 @@ defineProps<{
         class="flex items-start"
       >
         <span
-          class="bg-primary-600 dark:bg-primary-500 text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0"
+          class="bg-primary text-inverted dark:text-default text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0"
         >
           {{ index + 1 }}
         </span>
-        <span class="text-toned leading-relaxed">{{ instruction }}</span>
+        <span class="text-default leading-relaxed">{{ instruction }}</span>
       </li>
     </ol>
   </div>

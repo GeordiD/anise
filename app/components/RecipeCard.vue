@@ -7,10 +7,10 @@ const { recipe } = defineProps<{
 </script>
 
 <template>
-  <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
+  <UCard class="bg-muted hover:shadow-lg transition-shadow cursor-pointer">
     <NuxtLink :to="`/recipes/${recipe.id}`" class="block">
       <h2
-        class="text-xl font-semibold mb-3 text-default hover:text-primary-600"
+        class="text-xl font-semibold mb-3 text-default hover:text-primary"
       >
         {{ recipe.name }}
       </h2>
@@ -22,7 +22,7 @@ const { recipe } = defineProps<{
         </div>
       </div>
 
-      <div class="mt-4 text-primary-600 text-sm font-medium">View Recipe →</div>
+      <div class="mt-4 text-primary text-sm font-medium">View Recipe →</div>
     </NuxtLink>
   </UCard>
 </template>

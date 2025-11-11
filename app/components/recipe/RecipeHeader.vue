@@ -18,14 +18,14 @@ const { recipe } = defineProps<{
     <div class="flex gap-4">
       <div
         v-if="recipe.cuisine"
-        class="inline-block px-3 py-1 rounded-full text-sm font-medium w-fit bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200"
+        class="inline-block px-3 py-1 rounded-full text-sm font-medium w-fit bg-basil-100 text-basil-400"
       >
         {{ recipe.cuisine }}
       </div>
 
       <a
         :href="recipe.sourceUrl"
-        class="inline-block px-3 py-1 rounded-full text-sm font-medium w-fit bg-neutral-200 dark:bg-neutral-800 text-primary-800 dark:text-primary-200"
+        class="inline-block px-3 py-1 rounded-full text-sm font-medium w-fit bg-cream-300 dark:bg-muted text-default"
         target="_blank"
       >
         Visit 🔗
