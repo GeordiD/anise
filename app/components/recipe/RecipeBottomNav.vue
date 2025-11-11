@@ -4,7 +4,7 @@ const activeTab = defineModel<'ingredients' | 'instructions'>();
 
 <template>
   <div
-    class="fixed bottom-0 left-0 right-0 bg-basil-400 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 shadow-lg"
+    class="fixed bottom-0 left-0 right-0 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 shadow-lg"
   >
     <div class="grid grid-cols-2">
       <button
