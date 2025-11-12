@@ -12,6 +12,9 @@ const {
 } = await useFetch<GetRecipeByIdResponse>(`/api/recipes/${id}`, {
   key: `recipe-${id}`,
 });
+
+// Prevent screen from turning off while viewing recipe
+useScreenWakeLock();
 </script>
 
 <template>
