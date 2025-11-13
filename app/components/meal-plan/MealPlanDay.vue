@@ -5,11 +5,6 @@ const props = defineProps<{
   day: MealPlanDay;
 }>();
 
-const emit = defineEmits<{
-  selectMeals: [dayId: number, mealType: 'lunch' | 'dinner', mealIds: number[]];
-  removeMeal: [mealId: number];
-}>();
-
 // Format day name (e.g., "Monday" from "monday")
 const dayName = computed(() => {
   return (
@@ -32,8 +27,6 @@ const dayName = computed(() => {
         :day-id="day.id"
         meal-type="lunch"
         :meals="day.lunch"
-        @select-meals="(...args) => emit('selectMeals', ...args)"
-        @remove-meal="(...args) => emit('removeMeal', ...args)"
       />
 
       <!-- Dinner -->
@@ -41,8 +34,6 @@ const dayName = computed(() => {
         :day-id="day.id"
         meal-type="dinner"
         :meals="day.dinner"
-        @select-meals="(...args) => emit('selectMeals', ...args)"
-        @remove-meal="(...args) => emit('removeMeal', ...args)"
       />
     </div>
   </div>

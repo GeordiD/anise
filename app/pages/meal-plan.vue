@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { MealPlanResponse } from '~~/server/api/meal-plan/index.get';
-import type { AddMealRequest } from '~~/server/api/meal-plan/meals.post';
 
 definePageMeta({
   title: 'Meal Plan',
@@ -11,53 +10,11 @@ const {
   data: mealPlanData,
   pending,
   error,
-  refresh,
-} = await useFetch<MealPlanResponse>('/api/meal-plan');
+} = await useFetch<MealPlanResponse>('/api/meal-plan', {
+  key: 'meal-plan',
+});
 
 const mealPlan = computed(() => mealPlanData.value?.mealPlan);
-
-async function handleSelectRecipes(
-  dayId: number,
-  mealType: 'lunch' | 'dinner',
-  recipeIds: number[]
-) {
-  try {
-    // Add each selected recipe
-    for (const recipeId of recipeIds) {
-      const payload: AddMealRequest = {
-        dayId,
-        mealType,
-        recipeId,
-      };
-
-      await $fetch('/api/meal-plan/meals', {
-        method: 'POST',
-        body: payload,
-      });
-    }
-
-    // Refresh the meal plan data
-    await refresh();
-  } catch (err) {
-    console.error('Failed to add recipes:', err);
-    // TODO: Show error toast
-  }
-}
-
-// Remove meal from plan
-async function handleRemoveMeal(mealId: number) {
-  try {
-    await $fetch(`/api/meal-plan/meals/${mealId}`, {
-      method: 'DELETE',
-    });
-
-    // Refresh the meal plan data
-    await refresh();
-  } catch (err) {
-    console.error('Failed to remove meal:', err);
-    // TODO: Show error toast
-  }
-}
 
 // Clear all meals from the meal plan
 async function handleClearAll() {
@@ -67,7 +24,7 @@ async function handleClearAll() {
     });
 
     // Refresh the meal plan data
-    await refresh();
+    await refreshNuxtData('meal-plan');
   } catch (err) {
     console.error('Failed to clear meals:', err);
     // TODO: Show error toast
@@ -100,8 +57,6 @@ async function handleClearAll() {
           v-for="day in mealPlan.days"
           :key="day.id"
           :day="day"
-          @select-meals="handleSelectRecipes"
-          @remove-meal="handleRemoveMeal"
         />
       </div>
     </div>

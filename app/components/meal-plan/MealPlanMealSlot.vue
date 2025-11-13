@@ -8,19 +8,25 @@ const props = defineProps<{
   meals: MealPlanMeal[];
 }>();
 
-const emit = defineEmits<{
-  selectMeals: [
-    dayId: number,
-    mealType: 'lunch' | 'dinner',
-    recipeIds: number[]
-  ];
-  removeMeal: [mealId: number];
-}>();
-
 const mealLabel = computed(() => (props.mealType === 'lunch' ? 'L' : 'D'));
 
 const overlay = useOverlay();
 const modal = overlay.create(MealPlanRecipeModal);
+
+// Remove meal from plan
+async function handleRemoveMeal(mealId: number) {
+  try {
+    await $fetch(`/api/meal-plan/meals/${mealId}`, {
+      method: 'DELETE',
+    });
+
+    // Refresh the meal plan data
+    await refreshNuxtData('meal-plan');
+  } catch (err) {
+    console.error('Failed to remove meal:', err);
+    // TODO: Show error toast
+  }
+}
 </script>
 
 <template>
@@ -36,10 +42,8 @@ const modal = overlay.create(MealPlanRecipeModal);
         @click="
           () => {
             modal.open({
-              onSelect: (recipeIds) => {
-                emit('selectMeals', dayId, mealType, recipeIds);
-                modal.close();
-              },
+              dayId,
+              mealType,
             });
           }
         "
@@ -66,7 +70,7 @@ const modal = overlay.create(MealPlanRecipeModal);
           color="neutral"
           variant="ghost"
           size="xs"
-          @click="emit('removeMeal', meal.id)"
+          @click="handleRemoveMeal(meal.id)"
         />
       </div>
     </div>

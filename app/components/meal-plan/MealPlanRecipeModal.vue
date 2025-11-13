@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import type { RecipesResponse } from '~~/server/api/recipes/index.get';
+import type { AddMealRequest } from '~~/server/api/meal-plan/meals.post';
+
+const props = defineProps<{
+  dayId: number;
+  mealType: 'lunch' | 'dinner';
+}>();
 
 const emit = defineEmits<{
-  select: [recipeIds: number[]];
   close: [isSave: boolean];
 }>();
 
@@ -34,9 +39,30 @@ function toggleRecipe(recipeId: number) {
   }
 }
 
-function handleSelect() {
-  emit('select', selectedRecipeIds.value);
-  emit('close', true);
+async function handleSelect() {
+  try {
+    // Add each selected recipe
+    for (const recipeId of selectedRecipeIds.value) {
+      const payload: AddMealRequest = {
+        dayId: props.dayId,
+        mealType: props.mealType,
+        recipeId,
+      };
+
+      await $fetch('/api/meal-plan/meals', {
+        method: 'POST',
+        body: payload,
+      });
+    }
+
+    // Refresh the meal plan data using Nuxt's cache invalidation
+    await refreshNuxtData('meal-plan');
+
+    emit('close', true);
+  } catch (err) {
+    console.error('Failed to add recipes:', err);
+    // TODO: Show error toast
+  }
 }
 
 function handleClose() {
