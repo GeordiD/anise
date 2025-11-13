@@ -1,124 +1,44 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with code in this repository.
 
-## Project Overview
+## Tech Stack
 
-## Tech stack
+- **Nuxt 4** - Full-stack Vue 3 + TypeScript framework
+- **Drizzle ORM** - Database ORM with Postgres/PGlite
+- **Nuxt UI** - Component library and design system
+- **Package Manager**: `pnpm` (always use pnpm commands)
 
-- Nuxt 4 (full-stack Vue 3 + TypeScript)
-- Drizzle ORM with Postgres for local development
+## Key Commands
 
-## Development Commands
-
-- **Start development server**: `pnpm dev` (runs on http://localhost:3000)
-- **Build for production**: `pnpm build`
-- **Preview production build**: `pnpm preview`
-- **Install dependencies**: `pnpm install`
-- **Lint code**: `pnpm lint`
-- **Type check**: `pnpm typecheck`
-
-## Architecture
-
-### Database Layer
-
-- **ORM**: Drizzle ORM configured in `drizzle.config.ts`
-- **Schema**: Located in `server/db/schema.ts` with tables for users, posts, and comments
-- **Database setup**: `server/db/index.ts` exports the configured database connection
-- **Local database**: PGlite stores data in `./data/db.sqlite`
-
-### API Layer
-
-- **Server API**: Nuxt server routes in `server/api/` directory
-- **Example endpoint**: `server/api/users.get.ts` demonstrates basic database queries
-- When creating a `defineRouteMeta()` swagger config, don't worry about defining the responses -- that's too much information to manage.
-
-### Frontend
-
-- **Framework**: Nuxt 4 with Vue 3 and TypeScript
-- **UI Components**: @nuxt/ui module for design system
-- **Main app**: `app/app.vue` serves as the root component
-
-### Configuration
-
-- **Nuxt config**: `nuxt.config.ts` includes modules for ESLint, testing, and UI
-- **TypeScript**: Uses Nuxt's built-in TypeScript configuration with project references
-- **ESLint**: Configured through `eslint.config.mjs` using Nuxt's ESLint module
-
-## Package Manager
-
-This project uses `pnpm` as the package manager. Always use `pnpm` commands instead of npm or yarn.
+- `pnpm dev` - Start dev server (localhost:3000)
+- `pnpm lint` - Lint code
+- `pnpm typecheck` - Type check
 
 ## Development Workflow
 
-- When making changes to code, ALWAYS run `pnpm run lint` and `pnpm run typecheck` afterwards to ensure you're code is matching our style and typing systems.
-- Don't run the development server yourself. Assume the dev server is already running on localhost:3000
-- When needed, ask me if you should use playwright mcp server to check your work to make sure what you've done looks good. Be sure to check both light and dark mode (using the toggle in the nav bar)
+- ALWAYS run `pnpm lint` and `pnpm typecheck` after making code changes
+- Don't run the dev server yourself - assume it's already running on localhost:3000
+- When needed, ask about using playwright to verify changes in both light and dark mode
 
 ## Vue Development
 
-- When writing vue components, always use `<script setup lang="ts">`
-- When writing vue components, put the script section above the template section
+- Always use `<script setup lang="ts">`
+- Put `<script>` section above `<template>` section
+- Most frontend folders/files should be in the `/app/` folder
 
-## Styling and Dark Mode
+## API Development
 
-### Color System
+- Server routes are in `server/api/` directory
+- Database schema is in `server/db/schema.ts`
+- When creating `defineRouteMeta()` swagger config, don't define responses (too verbose)
 
-This project uses **Nuxt UI semantic color classes** that automatically handle light/dark mode transitions. Use these instead of manual `dark:` variants:
+## Documentation
 
-#### Text Colors (Recommended Usage)
+- [Color System](./docs/color-system.md) - Semantic color classes and dark mode guidelines
 
-- `text-default` - Primary text (headings, main content)
-- `text-muted` - Secondary text (labels, descriptions)
-- `text-inverted` - Inverted text
+## External Resources
 
-#### Semantic State Colors
-
-- `text-primary` - Primary brand color
-- `text-secondary` - Secondary brand color
-- `text-success` - Success states
-- `text-info` - Informational content
-- `text-warning` - Warning states
-- `text-error` - Error states
-
-#### Priamry Brand Colors
-
-- `basil-400` - primary brand color
-- `basil-300` - secondary brand color
-- `basil-200`
-- `basil-100`
-
-#### Background and Other Colors
-
-- For non-text elements, use Nuxt UI's semantic classes: `primary`, `secondary`, `success`, `info`, `warning`, `error`, `neutral`
-- These work with component props (e.g., `<UButton color="primary">`) and utility classes (e.g., `bg-primary`)
-
-- `bg-default` - Main background color for the app
-- `bg-muted` - Secondary background color (should be used for card placed on top of the background)
-
-- `border-default` - border color for all divider lines, and borders
-
-### Dark Mode Implementation
-
-- **Color Mode Module**: Uses `@nuxtjs/color-mode` configured in `nuxt.config.ts`
-- **Default Preference**: System preference with light mode fallback
-- **Toggle**: Available in top navigation with sun/moon icons
-- **Persistence**: Color mode preference is stored in localStorage
-
-### ❌ Avoid Manual Dark Mode Classes
-
-Don't use manual `dark:` variants for text:
-
-```vue
-<!-- ❌ Don't do this -->
-<h1 class="text-gray-900 dark:text-gray-100">Title</h1>
-<p class="text-gray-600 dark:text-gray-400">Description</p>
-
-<!-- ✅ Do this instead -->
-<h1 class="text-default">Title</h1>
-<p class="text-muted">Description</p>
-```
-
-## Project Structure
-
-- Most frontend folders/files should be put in the `/app/` folder
+- [Nuxt UI Documentation](https://ui.nuxt.com/llms.txt)
+- [Nuxt Documentation](https://nuxt.com/llms.txt)
+- [Drizzle ORM Documentation](https://orm.drizzle.team/llms.txt)
