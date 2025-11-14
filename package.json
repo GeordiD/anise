@@ -36,6 +36,7 @@
     "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
+    "@vite-pwa/nuxt": "^1.0.7",
     "drizzle-kit": "^0.31.4",
     "tailwindcss": "^4.1.12"
   }

@@ -8,12 +8,22 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxtjs/color-mode',
     '@vueuse/nuxt',
+    '@vite-pwa/nuxt',
   ],
   css: ['~/assets/css/main.css'],
   ui: {
     theme: {
-      colors: ['primary', 'secondary', 'success', 'info', 'warning', 'error', 'neutral', 'teal']
-    }
+      colors: [
+        'primary',
+        'secondary',
+        'success',
+        'info',
+        'warning',
+        'error',
+        'neutral',
+        'teal',
+      ],
+    },
   },
   colorMode: {
     preference: 'system', // default value of $colorMode.preference
@@ -35,6 +45,38 @@ export default defineNuxtConfig({
           process.env.NODE_ENV !== 'production' ||
           process.env.ENABLE_SWAGGER === 'true',
       },
+    },
+  },
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Heirloom',
+      short_name: 'Heirloom',
+      description: 'Recipes Worth Keeping',
+      theme_color: '#ffffff',
+      icons: [
+        {
+          src: 'pwa-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: 'pwa-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
+    },
+    workbox: {
+      navigateFallback: '/',
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
+    client: {
+      installPrompt: true,
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module',
     },
   },
 });

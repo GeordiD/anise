@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code when working with code in this repository.
 
+While the name of this project was originally "Anise", it's been re-branded to "Heirloom".
+
 ## Tech Stack
 
 - **Nuxt 4** - Full-stack Vue 3 + TypeScript framework
