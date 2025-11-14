@@ -1,4 +1,6 @@
 import * as cheerio from 'cheerio';
+import type { UsageStats } from '~~/server/services/llmService';
+import { extractRecipe } from '~~/server/services/prompts/extractRecipe';
 import { getDb } from '../db';
 import {
   recipeIngredientGroups,
@@ -9,7 +11,6 @@ import {
   tokenUsage,
 } from '../db/schema';
 import type { RecipeData } from '../schemas/recipeSchema';
-import { llmService, type UsageStats } from './llmService';
 
 export interface RecipeContentResult {
   success: boolean;
@@ -21,7 +22,7 @@ export interface RecipeContentResult {
 class RecipeScraper {
   async fetchByUrl(url: string): Promise<RecipeContentResult> {
     const cleanedContent = await this.fetchAndCleanContent(url);
-    const result = await llmService.extractRecipe(cleanedContent);
+    const result = await extractRecipe(cleanedContent);
 
     // Save recipe to database
     const savedRecipe = await this.saveRecipeToDatabase(

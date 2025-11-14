@@ -1,6 +1,7 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { generateObject } from 'ai';
-import { recipeSchema, type RecipeData } from '../schemas/recipeSchema';
+import { db } from '~~/server/db';
+import { tokenUsage } from '~~/server/db/schema';
+import type { RecipeData } from '../schemas/recipeSchema';
 
 export interface UsageStats {
   inputTokens: number;
@@ -17,7 +18,7 @@ export interface RecipeExtractionResult {
 }
 
 export class LLMService {
-  private anthropic: ReturnType<typeof createAnthropic>;
+  anthropic: ReturnType<typeof createAnthropic>;
 
   constructor() {
     const apiKey = process.env.ANTHROPIC_API_KEY || '';
@@ -30,49 +31,35 @@ export class LLMService {
     });
   }
 
-  async extractRecipe(content: string): Promise<RecipeExtractionResult> {
-    const prompt = `Extract recipe information from the provided content.
-
-Guidelines:
-- Extract ingredients as individual items, preserving quantities and descriptions
-- Extract instructions as numbered steps in order
-- Include timing information if present
-- Be precise and don't add information not in the content
-- If information is not available, omit that field
-- For difficulty, choose from: easy, medium, hard (or omit if unclear)
-
-Content:
-<content>
-${content}
-</content>`;
-
-    try {
-      const result = await generateObject({
-        model: this.anthropic('claude-sonnet-4-20250514'),
-        schema: recipeSchema,
-        prompt,
-        temperature: 0.1,
-        maxRetries: 3,
-      });
-
-      // Calculate usage and costs
-      const usage = this.calculateUsage(result.usage);
-
-      return {
-        recipe: result.object,
-        usage,
-      };
-    } catch (error) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: `Failed to extract recipe: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
-      });
+  // I wrote this but never used it. I'd like to, but hit roadblocks
+  // maybe dead? maybe gonna get revived.
+  async logUsage(
+    usage: {
+      inputTokens?: number;
+      outputTokens?: number;
+      totalTokens?: number;
+    },
+    // TODO: rethink this. I think AsyncLocalStorage might be nice here
+    metadata: {
+      recipeId: number;
     }
+  ): Promise<UsageStats> {
+    const stats = this.calculateUsage(usage);
+
+    await db.insert(tokenUsage).values({
+      recipeId: metadata.recipeId,
+      inputTokens: stats.inputTokens,
+      outputTokens: stats.outputTokens,
+      totalTokens: stats.totalTokens,
+      inputCost: stats.inputCost.toString(),
+      outputCost: stats.outputCost.toString(),
+      totalCost: stats.totalCost.toString(),
+    });
+
+    return stats;
   }
 
-  private calculateUsage(usage: {
+  calculateUsage(usage: {
     inputTokens?: number;
     outputTokens?: number;
     totalTokens?: number;

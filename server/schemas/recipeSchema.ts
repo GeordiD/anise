@@ -7,7 +7,7 @@ export const recipeSchema = z.object({
     .min(1, 'Recipe name is required')
     .max(200, 'Recipe name too long')
     .describe(
-      'The name of the recipe. Keep this as generic as possible while still being descriptive.'
+      'The name of the recipe. Keep this as generic as possible while still being descriptive. Shorter is better. Omit unnecessary words.'
     ),
 
   prepTime: z
