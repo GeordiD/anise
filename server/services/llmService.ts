@@ -1,5 +1,5 @@
-import { generateObject } from 'ai';
 import { createAnthropic } from '@ai-sdk/anthropic';
+import { generateObject } from 'ai';
 import { recipeSchema, type RecipeData } from '../schemas/recipeSchema';
 
 export interface UsageStats {
@@ -30,41 +30,7 @@ export class LLMService {
     });
   }
 
-  async extractRecipe(
-    content: string,
-    maxRetries: number = 3
-  ): Promise<RecipeExtractionResult> {
-    let lastError: Error | null = null;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        return await this.attemptRecipeExtraction(content, attempt);
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Unknown error');
-
-        if (attempt === maxRetries) {
-          break;
-        }
-
-        // Wait before retrying (exponential backoff)
-        await new Promise((resolve) =>
-          setTimeout(resolve, Math.pow(2, attempt - 1) * 1000)
-        );
-      }
-    }
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: `Failed to extract recipe after ${maxRetries} attempts: ${
-        lastError?.message || 'Unknown error'
-      }`,
-    });
-  }
-
-  private async attemptRecipeExtraction(
-    content: string,
-    attempt: number
-  ): Promise<RecipeExtractionResult> {
+  async extractRecipe(content: string): Promise<RecipeExtractionResult> {
     const prompt = `Extract recipe information from the provided content.
 
 Guidelines:
@@ -80,20 +46,30 @@ Content:
 ${content}
 </content>`;
 
-    const result = await generateObject({
-      model: this.anthropic('claude-sonnet-4-20250514'),
-      schema: recipeSchema,
-      prompt,
-      temperature: attempt > 1 ? 0.2 : 0.1,
-    });
+    try {
+      const result = await generateObject({
+        model: this.anthropic('claude-sonnet-4-20250514'),
+        schema: recipeSchema,
+        prompt,
+        temperature: 0.1,
+        maxRetries: 3,
+      });
 
-    // Calculate usage and costs
-    const usage = this.calculateUsage(result.usage);
+      // Calculate usage and costs
+      const usage = this.calculateUsage(result.usage);
 
-    return {
-      recipe: result.object,
-      usage,
-    };
+      return {
+        recipe: result.object,
+        usage,
+      };
+    } catch (error) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Failed to extract recipe: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      });
+    }
   }
 
   private calculateUsage(usage: {
