@@ -73,17 +73,17 @@ ${content}
   }
 
   private calculateUsage(usage: {
-    promptTokens?: number;
-    completionTokens?: number;
+    inputTokens?: number;
+    outputTokens?: number;
     totalTokens?: number;
   }): UsageStats {
-    const inputTokens = usage?.promptTokens ?? 0;
-    const outputTokens = usage?.completionTokens ?? 0;
-    const totalTokens = usage?.totalTokens ?? 0;
+    const inputTokens = usage.inputTokens ?? 0;
+    const outputTokens = usage.outputTokens ?? 0;
+    const totalTokens = usage.totalTokens ?? 0;
 
-    // Claude 3.5 Sonnet pricing: $3/M input, $15/M output
-    const inputCost = (inputTokens / 1000000) * 3;
-    const outputCost = (outputTokens / 1000000) * 15;
+    // Claude Sonnet 4 pricing: $3/M input, $15/M output
+    const inputCost = (inputTokens / 1_000_000) * 3;
+    const outputCost = (outputTokens / 1_000_000) * 15;
     const totalCost = inputCost + outputCost;
 
     return {
