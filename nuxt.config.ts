@@ -65,6 +65,12 @@ export default defineNuxtConfig({
           sizes: '512x512',
           type: 'image/png',
         },
+        {
+          src: 'pwa-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable',
+        },
       ],
     },
     workbox: {
@@ -77,6 +83,9 @@ export default defineNuxtConfig({
     devOptions: {
       enabled: true,
       type: 'module',
+    },
+    injectManifest: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
     },
   },
 });
