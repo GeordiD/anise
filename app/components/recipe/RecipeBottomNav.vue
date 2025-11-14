@@ -1,10 +1,14 @@
 <script lang="ts" setup>
 const activeTab = defineModel<'ingredients' | 'instructions'>();
+const isPWA = useIsPWA();
 </script>
 
 <template>
   <div
-    class="fixed bottom-0 left-0 right-0 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 shadow-lg"
+    :class="[
+      'fixed bottom-0 left-0 right-0 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 shadow-lg',
+      isPWA ? 'pb-6' : ''
+    ]"
   >
     <div class="grid grid-cols-2">
       <button
