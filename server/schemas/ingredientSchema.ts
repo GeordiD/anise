@@ -20,7 +20,7 @@ export const parsedIngredientSchema = z.object({
   name: z
     .string()
     .describe(
-      'The standardized ingredient name, singular form (e.g., "green bell pepper", "garlic clove", "olive oil")'
+      'The standardized ingredient name, singular form (e.g., "green bell pepper", "garlic", "olive oil")'
     ),
   note: z
     .string()

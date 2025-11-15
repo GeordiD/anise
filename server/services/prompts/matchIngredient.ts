@@ -26,7 +26,7 @@ Confidence levels:
 
 When suggesting a new standardized name (matchedId = null):
 - Use singular form
-- Use common/familiar terminology
+- Use common/familiar terminology to an American audience (i.e. "cilantro", not "coriander leaves")
 - Be consistent with existing naming patterns
 - Include important modifiers (e.g., "green bell pepper" not just "pepper")`;
 

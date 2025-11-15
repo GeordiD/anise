@@ -19,13 +19,13 @@ Your task is to extract:
 2. **unit**: The unit of measurement (e.g., "cups", "tbsp", "tsp", "oz", "grams", "lbs")
    - Use null if not specified or for count-based items (e.g., "2 eggs")
    - Normalize abbreviations: "tbsp" not "T", "tsp" not "t", etc.
-   - Keep plurals (e.g., "cups" not "cup")
+   - Should always be singular (e.g., "cup" not "cups")
 
 3. **name**: The ingredient name in singular form
    - Use singular form (e.g., "green bell pepper" not "green bell peppers")
-   - Keep descriptive modifiers that are part of the ingredient identity (e.g., "green bell pepper", "extra virgin olive oil")
-   - Remove preparation details (those go in notes)
-   - Standardize common variations (e.g., "garlic clove" not "clove of garlic")
+   - Keep descriptive modifiers that are part of the ingredient identity (e.g., "green bell pepper", "mandarin orange", "strip steak")
+   - Remove preparation details; those go in notes. (e.g., "minced", "freshly cracked")
+   - Standardize common variations (e.g., "olive oil" not "extra virgin olive oil")
 
 4. **note**: Preparation details, modifiers, or optional markers
    - Include preparation methods (e.g., "diced", "minced", "chopped")
@@ -34,9 +34,10 @@ Your task is to extract:
    - Use null if there are no additional notes
 
 Examples:
-- "2 cups green bell peppers, diced" → {quantity: "2", unit: "cups", name: "green bell pepper", note: "diced"}
+- "2 cups green bell peppers, diced" → {quantity: "2", unit: "cup", name: "green bell pepper", note: "diced"}
 - "1/2 tsp salt" → {quantity: "1/2", unit: "tsp", name: "salt", note: null}
-- "3 cloves garlic, minced" → {quantity: "3", unit: null, name: "garlic clove", note: "minced"}
+- "3 oranges" → {quantity: "3", unit: null, name: "orange", note: null}
+- "3 garlic cloves, minced" → {quantity: "3", unit: "clove", name: "garlic", note: "minced"}
 - "Salt and pepper to taste" → {quantity: null, unit: null, name: "salt and pepper", note: "to taste"}
 - "1 lb ground beef (optional)" → {quantity: "1", unit: "lb", name: "ground beef", note: "optional"}`;
 
