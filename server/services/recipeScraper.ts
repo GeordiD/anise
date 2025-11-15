@@ -1,6 +1,8 @@
 import * as cheerio from 'cheerio';
 import type { UsageStats } from '~~/server/services/llmService';
 import { extractRecipe } from '~~/server/services/prompts/extractRecipe';
+import { parseIngredient } from '~~/server/services/prompts/parseIngredient';
+import { ingredientService } from '~~/server/services/ingredientService';
 import { getDb } from '../db';
 import {
   recipeIngredientGroups,
@@ -11,6 +13,32 @@ import {
   tokenUsage,
 } from '../db/schema';
 import type { RecipeData } from '../schemas/recipeSchema';
+import type { ParsedIngredient } from '../schemas/ingredientSchema';
+
+/**
+ * Mapped ingredient data combining raw text with parsed components
+ */
+interface MappedIngredient {
+  raw: string; // Original ingredient text
+  parsed: ParsedIngredient;
+  standardizedIngredientId: number;
+}
+
+/**
+ * Ingredient group with mapped data
+ */
+interface MappedIngredientGroup {
+  name?: string;
+  items: string[]; // Keep original for backwards compatibility
+  mappedItems?: MappedIngredient[]; // New structured data
+}
+
+/**
+ * Recipe data with mapped ingredients
+ */
+interface RecipeDataWithMappedIngredients extends Omit<RecipeData, 'ingredients'> {
+  ingredients: MappedIngredientGroup[];
+}
 
 export interface RecipeContentResult {
   success: boolean;
@@ -22,20 +50,35 @@ export interface RecipeContentResult {
 class RecipeScraper {
   async fetchByUrl(url: string): Promise<RecipeContentResult> {
     const cleanedContent = await this.fetchAndCleanContent(url);
-    const result = await extractRecipe(cleanedContent);
+    const extractResult = await extractRecipe(cleanedContent);
+
+    // Map ingredients to standardized format
+    const { recipe: mappedRecipe, usage: mappingUsage } =
+      await this.mapIngredients(extractResult.recipe);
+
+    // Combine usage stats from extraction and mapping
+    const totalUsage: UsageStats = {
+      inputTokens: extractResult.usage.inputTokens + mappingUsage.inputTokens,
+      outputTokens:
+        extractResult.usage.outputTokens + mappingUsage.outputTokens,
+      totalTokens: extractResult.usage.totalTokens + mappingUsage.totalTokens,
+      inputCost: extractResult.usage.inputCost + mappingUsage.inputCost,
+      outputCost: extractResult.usage.outputCost + mappingUsage.outputCost,
+      totalCost: extractResult.usage.totalCost + mappingUsage.totalCost,
+    };
 
     // Save recipe to database
     const savedRecipe = await this.saveRecipeToDatabase(
-      result.recipe,
+      mappedRecipe,
       url,
-      result.usage
+      totalUsage
     );
 
     return {
       success: true,
       url: url,
       recipe: savedRecipe,
-      usage: result.usage,
+      usage: totalUsage,
     };
   }
 
@@ -103,8 +146,92 @@ class RecipeScraper {
     return cleanedContent;
   }
 
+  /**
+   * Map raw ingredient text to standardized ingredients with structured data
+   * Returns the recipe with mapped ingredients and accumulated usage stats
+   */
+  private async mapIngredients(
+    recipe: RecipeData
+  ): Promise<{ recipe: RecipeDataWithMappedIngredients; usage: UsageStats }> {
+    const mappedGroups: MappedIngredientGroup[] = [];
+    const totalUsage: UsageStats = {
+      inputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+      inputCost: 0,
+      outputCost: 0,
+      totalCost: 0,
+    };
+
+    // Process each ingredient group
+    for (const group of recipe.ingredients) {
+      const mappedItems: MappedIngredient[] = [];
+
+      // Process each ingredient in the group
+      for (const rawIngredient of group.items) {
+        try {
+          // Step 1: Parse the raw ingredient text
+          const { parsed, usage: parseUsage } =
+            await parseIngredient(rawIngredient);
+
+          // Accumulate parsing usage
+          totalUsage.inputTokens += parseUsage.inputTokens;
+          totalUsage.outputTokens += parseUsage.outputTokens;
+          totalUsage.totalTokens += parseUsage.totalTokens;
+          totalUsage.inputCost += parseUsage.inputCost;
+          totalUsage.outputCost += parseUsage.outputCost;
+          totalUsage.totalCost += parseUsage.totalCost;
+
+          // Step 2: Match or create standardized ingredient
+          const { ingredient, usage: matchUsage } =
+            await ingredientService.createOrMatchIngredient(parsed.name);
+
+          // Accumulate matching usage
+          totalUsage.inputTokens += matchUsage.inputTokens;
+          totalUsage.outputTokens += matchUsage.outputTokens;
+          totalUsage.totalTokens += matchUsage.totalTokens;
+          totalUsage.inputCost += matchUsage.inputCost;
+          totalUsage.outputCost += matchUsage.outputCost;
+          totalUsage.totalCost += matchUsage.totalCost;
+
+          // Step 3: Store the mapped data
+          mappedItems.push({
+            raw: rawIngredient,
+            parsed,
+            standardizedIngredientId: ingredient.id,
+          });
+        } catch (error) {
+          console.error(
+            `Failed to map ingredient "${rawIngredient}":`,
+            error
+          );
+          // On error, we could either:
+          // 1. Throw and fail the entire recipe import
+          // 2. Skip this ingredient and continue
+          // 3. Fall back to storing just the raw text
+          // For now, let's re-throw to fail the import
+          throw error;
+        }
+      }
+
+      mappedGroups.push({
+        name: group.name,
+        items: group.items, // Keep original for backwards compatibility
+        mappedItems,
+      });
+    }
+
+    return {
+      recipe: {
+        ...recipe,
+        ingredients: mappedGroups,
+      },
+      usage: totalUsage,
+    };
+  }
+
   private async saveRecipeToDatabase(
-    recipeData: RecipeData,
+    recipeData: RecipeData | RecipeDataWithMappedIngredients,
     sourceUrl: string,
     usage: UsageStats
   ): Promise<RecipeData & { id: number }> {
@@ -154,18 +281,42 @@ class RecipeScraper {
         }
 
         // Insert ingredients for this group
-        for (
-          let itemIndex = 0;
-          itemIndex < ingredientGroup.items.length;
-          itemIndex++
-        ) {
-          const ingredient = ingredientGroup.items[itemIndex];
-          if (ingredient) {
-            await tx.insert(recipeIngredients).values({
-              groupId: savedGroup.id,
-              ingredient: ingredient,
-              sortOrder: itemIndex,
-            });
+        // Check if this group has mapped ingredients (new format)
+        if ('mappedItems' in ingredientGroup && ingredientGroup.mappedItems) {
+          // New format: save structured data
+          for (
+            let itemIndex = 0;
+            itemIndex < ingredientGroup.mappedItems.length;
+            itemIndex++
+          ) {
+            const mappedItem = ingredientGroup.mappedItems[itemIndex];
+            if (mappedItem) {
+              await tx.insert(recipeIngredients).values({
+                groupId: savedGroup.id,
+                ingredient: mappedItem.raw, // Keep raw text for backwards compatibility
+                ingredientId: mappedItem.standardizedIngredientId,
+                quantity: mappedItem.parsed.quantity,
+                unit: mappedItem.parsed.unit,
+                note: mappedItem.parsed.note,
+                sortOrder: itemIndex,
+              });
+            }
+          }
+        } else {
+          // Old format: just save raw text
+          for (
+            let itemIndex = 0;
+            itemIndex < ingredientGroup.items.length;
+            itemIndex++
+          ) {
+            const ingredient = ingredientGroup.items[itemIndex];
+            if (ingredient) {
+              await tx.insert(recipeIngredients).values({
+                groupId: savedGroup.id,
+                ingredient: ingredient,
+                sortOrder: itemIndex,
+              });
+            }
           }
         }
       }

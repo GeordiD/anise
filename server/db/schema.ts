@@ -4,6 +4,7 @@ import {
   date,
   decimal,
   foreignKey,
+  index,
   integer,
   pgEnum,
   pgTable,
@@ -76,19 +77,33 @@ export const recipeIngredients = pgTable(
      * @deprecated we should reference an ingredient now
      */
     ingredient: text('ingredient').notNull(),
+
+    // New standardized ingredient fields
+    ingredientId: integer('ingredient_id'),
+    quantity: text('quantity'),
+    unit: text('unit'),
+    note: text('note'),
   },
   (table) => [
     foreignKey({
       columns: [table.groupId],
       foreignColumns: [recipeIngredientGroups.id],
     }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.ingredientId],
+      foreignColumns: [ingredients.id],
+    }).onDelete('set null'),
   ]
 );
 
-export const ingredients = pgTable('ingredients', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-});
+export const ingredients = pgTable(
+  'ingredients',
+  {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+  },
+  (table) => [index('ingredients_name_idx').on(table.name)]
+);
 
 export const recipeIngredientSubstitutions = pgTable(
   'recipe_ingredient_substitutions',
@@ -264,6 +279,10 @@ export const recipeIngredientsRelations = relations(
     group: one(recipeIngredientGroups, {
       fields: [recipeIngredients.groupId],
       references: [recipeIngredientGroups.id],
+    }),
+    standardizedIngredient: one(ingredients, {
+      fields: [recipeIngredients.ingredientId],
+      references: [ingredients.id],
     }),
     substitutions: many(recipeIngredientSubstitutions),
   })
