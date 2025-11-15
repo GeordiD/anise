@@ -13,7 +13,15 @@ import {
 } from 'drizzle-orm/pg-core';
 
 // Enums
-export const dayOfWeekEnum = pgEnum('day_of_week', ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']);
+export const dayOfWeekEnum = pgEnum('day_of_week', [
+  'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+]);
 export const mealTypeEnum = pgEnum('meal_type', ['lunch', 'dinner']);
 
 export const users = pgTable('users', {
@@ -47,12 +55,12 @@ export const recipeIngredientGroups = pgTable(
     sortOrder: integer('sort_order').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
-    recipeReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
     }).onDelete('cascade'),
-  })
+  ]
 );
 
 export const recipeIngredients = pgTable(
@@ -60,18 +68,27 @@ export const recipeIngredients = pgTable(
   {
     id: serial('id').primaryKey(),
     groupId: integer('group_id').notNull(),
-    ingredient: text('ingredient').notNull(),
     sortOrder: integer('sort_order').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     doNotUse: boolean('do_not_use').default(false),
+
+    /**
+     * @deprecated we should reference an ingredient now
+     */
+    ingredient: text('ingredient').notNull(),
   },
-  (table) => ({
-    groupReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.groupId],
       foreignColumns: [recipeIngredientGroups.id],
     }).onDelete('cascade'),
-  })
+  ]
 );
+
+export const ingredients = pgTable('ingredients', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+});
 
 export const recipeIngredientSubstitutions = pgTable(
   'recipe_ingredient_substitutions',
@@ -80,12 +97,12 @@ export const recipeIngredientSubstitutions = pgTable(
     ingredientId: integer('ingredient_id').notNull(),
     ingredient: text('ingredient').notNull(),
   },
-  (table) => ({
-    ingredientReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.ingredientId],
       foreignColumns: [recipeIngredients.id],
     }).onDelete('cascade'),
-  })
+  ]
 );
 
 export const recipeInstructions = pgTable(
@@ -97,12 +114,12 @@ export const recipeInstructions = pgTable(
     stepNumber: integer('step_number').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
-    recipeReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
     }).onDelete('cascade'),
-  })
+  ]
 );
 
 export const recipeNotes = pgTable(
@@ -114,12 +131,12 @@ export const recipeNotes = pgTable(
     sortOrder: integer('sort_order').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
-    recipeReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
     }).onDelete('cascade'),
-  })
+  ]
 );
 
 export const tokenUsage = pgTable(
@@ -135,12 +152,12 @@ export const tokenUsage = pgTable(
     totalCost: decimal('total_cost', { precision: 10, scale: 6 }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
-    recipeReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
     }).onDelete('cascade'),
-  })
+  ]
 );
 
 export const mealPlans = pgTable(
@@ -152,12 +169,12 @@ export const mealPlans = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => ({
-    userReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.userId],
       foreignColumns: [users.id],
     }).onDelete('cascade'),
-  })
+  ]
 );
 
 export const mealPlanDays = pgTable(
@@ -169,12 +186,12 @@ export const mealPlanDays = pgTable(
     date: date('date').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
-    mealPlanReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.mealPlanId],
       foreignColumns: [mealPlans.id],
     }).onDelete('cascade'),
-  })
+  ]
 );
 
 export const mealPlanMeals = pgTable(
@@ -187,16 +204,16 @@ export const mealPlanMeals = pgTable(
     sortOrder: integer('sort_order').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
-    dayReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.dayId],
       foreignColumns: [mealPlanDays.id],
     }).onDelete('cascade'),
-    recipeReference: foreignKey({
+    foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
     }),
-  })
+  ]
 );
 
 export const shoppingListItems = pgTable(
@@ -210,16 +227,16 @@ export const shoppingListItems = pgTable(
     sortOrder: integer('sort_order').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
-    mealPlanReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.mealPlanId],
       foreignColumns: [mealPlans.id],
     }).onDelete('cascade'),
-    recipeReference: foreignKey({
+    foreignKey({
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
     }),
-  })
+  ]
 );
 
 // Relations
@@ -294,13 +311,16 @@ export const mealPlansRelations = relations(mealPlans, ({ one, many }) => ({
   days: many(mealPlanDays),
 }));
 
-export const mealPlanDaysRelations = relations(mealPlanDays, ({ one, many }) => ({
-  mealPlan: one(mealPlans, {
-    fields: [mealPlanDays.mealPlanId],
-    references: [mealPlans.id],
-  }),
-  meals: many(mealPlanMeals),
-}));
+export const mealPlanDaysRelations = relations(
+  mealPlanDays,
+  ({ one, many }) => ({
+    mealPlan: one(mealPlans, {
+      fields: [mealPlanDays.mealPlanId],
+      references: [mealPlans.id],
+    }),
+    meals: many(mealPlanMeals),
+  })
+);
 
 export const mealPlanMealsRelations = relations(mealPlanMeals, ({ one }) => ({
   day: one(mealPlanDays, {
@@ -313,13 +333,16 @@ export const mealPlanMealsRelations = relations(mealPlanMeals, ({ one }) => ({
   }),
 }));
 
-export const shoppingListItemsRelations = relations(shoppingListItems, ({ one }) => ({
-  mealPlan: one(mealPlans, {
-    fields: [shoppingListItems.mealPlanId],
-    references: [mealPlans.id],
-  }),
-  recipe: one(recipes, {
-    fields: [shoppingListItems.recipeId],
-    references: [recipes.id],
-  }),
-}));
+export const shoppingListItemsRelations = relations(
+  shoppingListItems,
+  ({ one }) => ({
+    mealPlan: one(mealPlans, {
+      fields: [shoppingListItems.mealPlanId],
+      references: [mealPlans.id],
+    }),
+    recipe: one(recipes, {
+      fields: [shoppingListItems.recipeId],
+      references: [recipes.id],
+    }),
+  })
+);
