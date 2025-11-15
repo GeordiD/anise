@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import DeleteRecipe from '~/components/recipe/DeleteRecipe.vue';
 import type { GetRecipeByIdResponse } from '~~/server/api/recipes/[id].get';
 
 const { recipe } = defineProps<{
@@ -9,11 +8,7 @@ const { recipe } = defineProps<{
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex items-start justify-between gap-4">
-      <h1 class="text-4xl font-bold text-default">{{ recipe.name }}</h1>
-
-      <DeleteRecipe :recipe-id="recipe.id" />
-    </div>
+    <h1 class="text-4xl font-bold text-default">{{ recipe.name }}</h1>
 
     <div class="flex gap-4">
       <div
