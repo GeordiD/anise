@@ -22,14 +22,6 @@ const { recipe } = defineProps<{
       >
         {{ recipe.cuisine }}
       </div>
-
-      <a
-        :href="recipe.sourceUrl"
-        class="inline-block px-3 py-1 rounded-full text-sm font-medium w-fit bg-cream-300 dark:bg-muted text-default"
-        target="_blank"
-      >
-        Visit 🔗
-      </a>
     </div>
   </div>
 </template>
