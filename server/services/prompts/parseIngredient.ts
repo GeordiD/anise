@@ -23,7 +23,7 @@ Your task is to extract:
 
 3. **name**: The ingredient name in singular form
    - Use singular form (e.g., "green bell pepper" not "green bell peppers")
-   - Keep descriptive modifiers that are part of the ingredient identity (e.g., "green bell pepper", "mandarin orange", "strip steak")
+   - Keep descriptive modifiers that are part of the ingredient identity (e.g., "green bell pepper", "mandarin orange", "chicken breast")
    - Remove preparation details; those go in notes. (e.g., "minced", "freshly cracked")
    - Standardize common variations (e.g., "olive oil" not "extra virgin olive oil")
 
