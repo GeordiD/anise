@@ -13,9 +13,9 @@ const activeTab = ref<'ingredients' | 'instructions'>('ingredients');
     <div class="flex flex-col gap-4 pb-4">
       <recipe-header :recipe="recipe" />
 
-      <!-- Segmented control only visible on mobile -->
+      <!-- Recipe tabs only visible on mobile -->
       <div class="lg:hidden">
-        <recipe-bottom-nav v-model="activeTab" />
+        <recipe-tabs v-model="activeTab" />
       </div>
 
       <hr />
