@@ -27,6 +27,9 @@
   --ui-secondary: var(--color-basil-300);
   --ui-bg: var(--color-cream-100);
   --ui-bg-muted: var(--color-cream-200);
+  --ui-bg-elevated: var(--color-cream-300);
+  --ui-bg-accented: var(--color-cream-400);
+  --ui-bg-inverted: var(--color-cream-600);
   --ui-text: var(--color-cream-600);
   --ui-text-inverted: var(--color-cream-200);
   --ui-text-muted: var(--color-cream-500);
@@ -39,6 +42,9 @@
   --ui-secondary: var(--color-basil-300);
   --ui-bg: var(--color-cream-800);
   --ui-bg-muted: var(--color-cream-700);
+  --ui-bg-elevated: var(--color-cream-600);
+  --ui-bg-accented: var(--color-cream-500);
+  --ui-bg-inverted: var(--color-cream-100);
   --ui-text: var(--color-cream-100);
   --ui-text-inverted: var(--color-cream-600);
   --ui-text-muted: var(--color-cream-200);

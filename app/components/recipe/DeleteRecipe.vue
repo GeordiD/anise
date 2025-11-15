@@ -32,7 +32,7 @@ const handleDelete = async () => {
   <div>
     <UButton
       v-if="!isShowingConfirmation && !isDeleting"
-      icon="i-fe-trash"
+      icon="i-heroicons-trash"
       color="error"
       variant="ghost"
       size="lg"

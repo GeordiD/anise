@@ -11,6 +11,7 @@ const activeTab = ref<'ingredients' | 'instructions'>('ingredients');
 <template>
   <div>
     <div class="flex flex-col gap-4 pb-4">
+      <recipe-top-nav :recipe="recipe" />
       <recipe-header :recipe="recipe" />
 
       <!-- Recipe tabs only visible on mobile -->
