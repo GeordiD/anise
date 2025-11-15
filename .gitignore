@@ -25,3 +25,5 @@ logs
 
 data
 .playwright-mcp/
+
+docs/.geordi
