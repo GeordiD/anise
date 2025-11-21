@@ -1,8 +1,9 @@
 import * as cheerio from 'cheerio';
-import type { UsageStats } from '~~/server/services/llmService';
+import { ingredientService } from '~~/server/services/ingredientService';
 import { extractRecipe } from '~~/server/services/prompts/extractRecipe';
 import { parseIngredient } from '~~/server/services/prompts/parseIngredient';
-import { ingredientService } from '~~/server/services/ingredientService';
+import type { UsageStats } from '~~/server/utils/UsageStats';
+import { createUsageStats } from '~~/server/utils/UsageStats';
 import { getDb } from '../db';
 import {
   recipeIngredientGroups,
@@ -12,8 +13,8 @@ import {
   recipes,
   tokenUsage,
 } from '../db/schema';
-import type { RecipeData } from '../schemas/recipeSchema';
 import type { ParsedIngredient } from '../schemas/ingredientSchema';
+import type { RecipeData } from '../schemas/recipeSchema';
 
 /**
  * Mapped ingredient data combining raw text with parsed components
@@ -36,7 +37,8 @@ interface MappedIngredientGroup {
 /**
  * Recipe data with mapped ingredients
  */
-interface RecipeDataWithMappedIngredients extends Omit<RecipeData, 'ingredients'> {
+interface RecipeDataWithMappedIngredients
+  extends Omit<RecipeData, 'ingredients'> {
   ingredients: MappedIngredientGroup[];
 }
 
@@ -154,14 +156,7 @@ class RecipeScraper {
     recipe: RecipeData
   ): Promise<{ recipe: RecipeDataWithMappedIngredients; usage: UsageStats }> {
     const mappedGroups: MappedIngredientGroup[] = [];
-    const totalUsage: UsageStats = {
-      inputTokens: 0,
-      outputTokens: 0,
-      totalTokens: 0,
-      inputCost: 0,
-      outputCost: 0,
-      totalCost: 0,
-    };
+    const totalUsage = createUsageStats();
 
     // Process each ingredient group
     for (const group of recipe.ingredients) {
@@ -171,8 +166,9 @@ class RecipeScraper {
       for (const rawIngredient of group.items) {
         try {
           // Step 1: Parse the raw ingredient text
-          const { parsed, usage: parseUsage } =
-            await parseIngredient(rawIngredient);
+          const { parsed, usage: parseUsage } = await parseIngredient(
+            rawIngredient
+          );
 
           // Accumulate parsing usage
           totalUsage.inputTokens += parseUsage.inputTokens;
@@ -201,10 +197,7 @@ class RecipeScraper {
             standardizedIngredientId: ingredient.id,
           });
         } catch (error) {
-          console.error(
-            `Failed to map ingredient "${rawIngredient}":`,
-            error
-          );
+          console.error(`Failed to map ingredient "${rawIngredient}":`, error);
           // On error, we could either:
           // 1. Throw and fail the entire recipe import
           // 2. Skip this ingredient and continue

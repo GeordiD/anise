@@ -1,8 +1,8 @@
 import { generateObject } from 'ai';
 import type { RecipeData } from '~~/server/schemas/recipeSchema';
 import { recipeSchema } from '~~/server/schemas/recipeSchema';
-import type { UsageStats } from '~~/server/services/llmService';
 import { llmService } from '~~/server/services/llmService';
+import type { UsageStats } from '~~/server/utils/UsageStats';
 
 export async function extractRecipe(content: string): Promise<{
   recipe: RecipeData;

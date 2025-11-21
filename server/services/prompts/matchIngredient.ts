@@ -1,8 +1,8 @@
 import { generateObject } from 'ai';
 import type { IngredientMatch } from '~~/server/schemas/ingredientSchema';
 import { ingredientMatchSchema } from '~~/server/schemas/ingredientSchema';
-import type { UsageStats } from '~~/server/services/llmService';
 import { llmService } from '~~/server/services/llmService';
+import type { UsageStats } from '~~/server/utils/UsageStats';
 
 /**
  * System prompt for ingredient matching - this will be cached by Anthropic

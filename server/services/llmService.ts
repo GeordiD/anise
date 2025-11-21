@@ -1,16 +1,8 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { db } from '~~/server/db';
 import { tokenUsage } from '~~/server/db/schema';
+import type { UsageStats } from '~~/server/utils/UsageStats';
 import type { RecipeData } from '../schemas/recipeSchema';
-
-export interface UsageStats {
-  inputTokens: number;
-  outputTokens: number;
-  totalTokens: number;
-  inputCost: number;
-  outputCost: number;
-  totalCost: number;
-}
 
 export interface RecipeExtractionResult {
   recipe: RecipeData;

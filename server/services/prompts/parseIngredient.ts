@@ -1,8 +1,8 @@
 import { generateObject } from 'ai';
 import type { ParsedIngredient } from '~~/server/schemas/ingredientSchema';
 import { parsedIngredientSchema } from '~~/server/schemas/ingredientSchema';
-import type { UsageStats } from '~~/server/services/llmService';
 import { llmService } from '~~/server/services/llmService';
+import type { UsageStats } from '~~/server/utils/UsageStats';
 
 /**
  * System prompt for ingredient parsing - this will be cached by Anthropic

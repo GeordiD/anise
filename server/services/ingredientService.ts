@@ -1,19 +1,19 @@
-import { ilike, or, sql } from 'drizzle-orm';
-import type { StandardizedIngredient } from '~~/server/schemas/ingredientSchema';
+import { eq, ilike, or, sql } from 'drizzle-orm';
+import type { UsageStats } from '~~/server/utils/UsageStats';
+import { createUsageStats } from '~~/server/utils/UsageStats';
 import { getDb } from '../db';
 import { ingredients } from '../db/schema';
 import { matchIngredient } from './prompts/matchIngredient';
-import type { UsageStats } from './llmService';
 
 class IngredientService {
   /**
    * Find ingredients similar to the given name using fuzzy text search
    * Uses ILIKE for case-insensitive pattern matching
    */
-  async findSimilarIngredients(
+  private async findSimilarIngredients(
     name: string,
     limit: number = 20
-  ): Promise<StandardizedIngredient[]> {
+  ): Promise<{ id: number; name: string }[]> {
     const db = await getDb();
 
     // Extract key words from the ingredient name for better matching
@@ -35,23 +35,40 @@ class IngredientService {
     return similarIngredients;
   }
 
+  private async findIngredientByName(name: string) {
+    const db = await getDb();
+
+    return await db.query.ingredients.findFirst({
+      where: eq(ingredients.name, name.toLowerCase().trim()),
+    });
+  }
+
   /**
    * Create or match an ingredient against existing standardized ingredients
    * Returns the standardized ingredient (either matched or newly created) and usage stats
    */
   async createOrMatchIngredient(parsedName: string): Promise<{
-    ingredient: StandardizedIngredient;
+    ingredient: { id: number; name: string };
     usage: UsageStats;
   }> {
     const db = await getDb();
 
-    // Step 1: Find similar ingredients from the database
+    // Step 1: If we find an exact match, use that
+    const exactMatch = await this.findIngredientByName(parsedName);
+    if (exactMatch) {
+      return {
+        ingredient: exactMatch,
+        usage: createUsageStats(),
+      };
+    }
+
+    // Step 2: Find similar ingredients from the database
     const candidates = await this.findSimilarIngredients(parsedName);
 
-    // Step 2: Use LLM to match against candidates
+    // Step 3: Use LLM to match against candidates
     const { match, usage } = await matchIngredient(parsedName, candidates);
 
-    // Step 3: Either return matched ingredient or create new one
+    // Step 4: Either return matched ingredient or create new one
     if (match.matchedId !== null) {
       // Found a match - return the existing ingredient
       const [existingIngredient] = await db
@@ -92,20 +109,6 @@ class IngredientService {
         usage,
       };
     }
-  }
-
-  /**
-   * Get an ingredient by ID
-   */
-  async getById(id: number): Promise<StandardizedIngredient | null> {
-    const db = await getDb();
-    const [ingredient] = await db
-      .select()
-      .from(ingredients)
-      .where(sql`${ingredients.id} = ${id}`)
-      .limit(1);
-
-    return ingredient || null;
   }
 
   /**
