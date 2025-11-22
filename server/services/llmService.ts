@@ -55,23 +55,40 @@ export class LLMService {
     inputTokens?: number;
     outputTokens?: number;
     totalTokens?: number;
+    cacheCreationInputTokens?: number;
+    cacheReadInputTokens?: number;
   }): UsageStats {
     const inputTokens = usage.inputTokens ?? 0;
     const outputTokens = usage.outputTokens ?? 0;
     const totalTokens = usage.totalTokens ?? 0;
+    const cacheCreationInputTokens = usage.cacheCreationInputTokens ?? 0;
+    const cacheReadInputTokens = usage.cacheReadInputTokens ?? 0;
 
-    // Claude Sonnet 4 pricing: $3/M input, $15/M output
+    // Claude Sonnet 4 pricing:
+    // - Input tokens: $3/M
+    // - Cache writes: $3.75/M (25% surcharge)
+    // - Cache reads: $0.30/M (90% discount)
+    // - Output tokens: $15/M
     const inputCost = (inputTokens / 1_000_000) * 3;
+    const cacheWriteCost = (cacheCreationInputTokens / 1_000_000) * 3.75;
+    const cacheReadCost = (cacheReadInputTokens / 1_000_000) * 0.3;
     const outputCost = (outputTokens / 1_000_000) * 15;
-    const totalCost = inputCost + outputCost;
+    const totalCost = inputCost + cacheWriteCost + cacheReadCost + outputCost;
+
+    const decimalPrecision = 4;
 
     return {
       inputTokens,
       outputTokens,
       totalTokens,
-      inputCost: Number(inputCost.toFixed(6)),
-      outputCost: Number(outputCost.toFixed(6)),
-      totalCost: Number(totalCost.toFixed(6)),
+      cacheCreationInputTokens:
+        cacheCreationInputTokens > 0 ? cacheCreationInputTokens : undefined,
+      cacheReadInputTokens:
+        cacheReadInputTokens > 0 ? cacheReadInputTokens : undefined,
+      inputCost: Number(inputCost.toFixed(decimalPrecision)),
+      outputCost: Number(outputCost.toFixed(decimalPrecision)),
+      totalCost: Number(totalCost.toFixed(decimalPrecision)),
+      estimatedCost: Number(totalCost.toFixed(decimalPrecision)),
     };
   }
 }

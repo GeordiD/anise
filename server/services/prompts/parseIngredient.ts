@@ -5,8 +5,9 @@ import { llmService } from '~~/server/services/llmService';
 import type { UsageStats } from '~~/server/utils/UsageStats';
 
 /**
- * System prompt for ingredient parsing - this will be cached by Anthropic
- * to reduce costs when parsing multiple ingredients
+ * System prompt for ingredient parsing
+ * This is marked with Anthropic's cache control to reduce costs when parsing multiple ingredients.
+ * First call creates the cache, subsequent calls read from cache at 90% cost reduction.
  */
 const PARSING_SYSTEM_PROMPT = `You are an expert at parsing recipe ingredient text into structured components.
 
@@ -31,7 +32,7 @@ Your task is to extract:
    - Include preparation methods (e.g., "diced", "minced", "chopped")
    - Include state descriptors (e.g., "room temperature", "melted", "softened")
    - Include optional markers (e.g., "optional", "if desired")
-   - Use null if there are no additional notes
+   - Use null if there are no additional notes.
 
 Examples:
 - "2 cups green bell peppers, diced" → {quantity: "2", unit: "cup", name: "green bell pepper", note: "diced"}
@@ -53,16 +54,40 @@ export async function parseIngredient(rawIngredient: string): Promise<{
     const result = await generateObject({
       model: llmService.anthropic('claude-sonnet-4-20250514'),
       schema: parsedIngredientSchema,
-      system: PARSING_SYSTEM_PROMPT,
-      prompt: `Parse the following ingredient:\n\n${rawIngredient}`,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: PARSING_SYSTEM_PROMPT,
+              providerOptions: {
+                anthropic: { cacheControl: { type: 'ephemeral' } },
+              },
+            },
+            {
+              type: 'text',
+              text: `Parse the following ingredient:\n\n${rawIngredient}`,
+            },
+          ],
+        },
+      ],
       temperature: 0.1,
       maxRetries: 2,
-      // TODO: Add Anthropic prompt caching when AI SDK supports it
     });
+
+    const cacheCreation = result.providerMetadata?.anthropic?.cacheCreationInputTokens;
+    const cacheRead = result.usage.cachedInputTokens;
 
     return {
       parsed: result.object,
-      usage: llmService.calculateUsage(result.usage),
+      usage: llmService.calculateUsage({
+        ...result.usage,
+        // AI SDK provides cache creation tokens in provider metadata
+        cacheCreationInputTokens: typeof cacheCreation === 'number' ? cacheCreation : 0,
+        // AI SDK normalizes cache read tokens as 'cachedInputTokens' in the usage object
+        cacheReadInputTokens: typeof cacheRead === 'number' ? cacheRead : 0,
+      }),
     };
   } catch (error) {
     throw createError({

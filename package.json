@@ -11,7 +11,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "test-prompt": "tsx --tsconfig scripts/tsconfig.json --env-file=.env scripts/test-prompt.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.44",
@@ -40,6 +41,7 @@
   "devDependencies": {
     "@vite-pwa/nuxt": "^1.0.7",
     "drizzle-kit": "^0.31.4",
-    "tailwindcss": "^4.1.12"
+    "tailwindcss": "^4.1.12",
+    "tsx": "^4.20.6"
   }
 }
