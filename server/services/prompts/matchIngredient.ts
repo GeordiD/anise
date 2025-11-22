@@ -76,7 +76,7 @@ Determine:
 
     return {
       match: result.object,
-      usage: llmService.calculateUsage(result.usage),
+      usage: llmService.calculateUsage(result),
     };
   } catch (error) {
     throw createError({

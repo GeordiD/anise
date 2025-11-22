@@ -1,6 +1,5 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { db } from '~~/server/db';
-import { tokenUsage } from '~~/server/db/schema';
+import type { GenerateObjectResult } from 'ai';
 import type { UsageStats } from '~~/server/utils/UsageStats';
 import type { RecipeData } from '../schemas/recipeSchema';
 
@@ -23,46 +22,24 @@ export class LLMService {
     });
   }
 
-  // I wrote this but never used it. I'd like to, but hit roadblocks
-  // maybe dead? maybe gonna get revived.
-  async logUsage(
-    usage: {
-      inputTokens?: number;
-      outputTokens?: number;
-      totalTokens?: number;
-    },
-    // TODO: rethink this. I think AsyncLocalStorage might be nice here
-    metadata: {
-      recipeId: number;
-    }
-  ): Promise<UsageStats> {
-    const stats = this.calculateUsage(usage);
+  /**
+   * Calculate usage statistics from AI SDK generateObject result
+   * Automatically extracts cache tokens from Anthropic provider metadata
+   */
+  calculateUsage(result: GenerateObjectResult<unknown>): UsageStats {
+    const inputTokens = result.usage.inputTokens ?? 0;
+    const outputTokens = result.usage.outputTokens ?? 0;
+    const totalTokens = result.usage.totalTokens ?? 0;
+    const cacheReadInputTokens = result.usage.cachedInputTokens ?? 0;
 
-    await db.insert(tokenUsage).values({
-      recipeId: metadata.recipeId,
-      inputTokens: stats.inputTokens,
-      outputTokens: stats.outputTokens,
-      totalTokens: stats.totalTokens,
-      inputCost: stats.inputCost.toString(),
-      outputCost: stats.outputCost.toString(),
-      totalCost: stats.totalCost.toString(),
-    });
-
-    return stats;
-  }
-
-  calculateUsage(usage: {
-    inputTokens?: number;
-    outputTokens?: number;
-    totalTokens?: number;
-    cacheCreationInputTokens?: number;
-    cacheReadInputTokens?: number;
-  }): UsageStats {
-    const inputTokens = usage.inputTokens ?? 0;
-    const outputTokens = usage.outputTokens ?? 0;
-    const totalTokens = usage.totalTokens ?? 0;
-    const cacheCreationInputTokens = usage.cacheCreationInputTokens ?? 0;
-    const cacheReadInputTokens = usage.cacheReadInputTokens ?? 0;
+    // Extract cache creation tokens from Anthropic provider metadata
+    const anthropicMetadata = result.providerMetadata?.anthropic as
+      | { cacheCreationInputTokens?: number }
+      | undefined;
+    const cacheCreationInputTokens =
+      typeof anthropicMetadata?.cacheCreationInputTokens === 'number'
+        ? anthropicMetadata.cacheCreationInputTokens
+        : 0;
 
     // Claude Sonnet 4 pricing:
     // - Input tokens: $3/M

@@ -76,18 +76,9 @@ export async function parseIngredient(rawIngredient: string): Promise<{
       maxRetries: 2,
     });
 
-    const cacheCreation = result.providerMetadata?.anthropic?.cacheCreationInputTokens;
-    const cacheRead = result.usage.cachedInputTokens;
-
     return {
       parsed: result.object,
-      usage: llmService.calculateUsage({
-        ...result.usage,
-        // AI SDK provides cache creation tokens in provider metadata
-        cacheCreationInputTokens: typeof cacheCreation === 'number' ? cacheCreation : 0,
-        // AI SDK normalizes cache read tokens as 'cachedInputTokens' in the usage object
-        cacheReadInputTokens: typeof cacheRead === 'number' ? cacheRead : 0,
-      }),
+      usage: llmService.calculateUsage(result),
     };
   } catch (error) {
     throw createError({
