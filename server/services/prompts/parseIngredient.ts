@@ -21,6 +21,7 @@ Your task is to extract:
    - Use null if not specified or for count-based items (e.g., "2 eggs")
    - Normalize abbreviations: "tbsp" not "T", "tsp" not "t", etc.
    - Should always be singular (e.g., "cup" not "cups")
+   - For containers (can, pouch, jar, box, package), include the container size in the unit (e.g., "14.5 oz can", "10 oz pouch")
 
 3. **name**: The ingredient name in singular form
    - Use singular form (e.g., "green bell pepper" not "green bell peppers")
@@ -39,6 +40,7 @@ Examples:
 - "1/2 tsp salt" → {quantity: "1/2", unit: "tsp", name: "salt", note: null}
 - "3 oranges" → {quantity: "3", unit: null, name: "orange", note: null}
 - "3 garlic cloves, minced" → {quantity: "3", unit: "clove", name: "garlic", note: "minced"}
+- "2 14.5 oz cans diced tomatoes" → {quantity: "2", unit: "14.5 oz can", name: "diced tomato", note: null}
 - "Salt and pepper to taste" → {quantity: null, unit: null, name: "salt and pepper", note: "to taste"}
 - "1 lb ground beef (optional)" → {quantity: "1", unit: "lb", name: "ground beef", note: "optional"}`;
 
