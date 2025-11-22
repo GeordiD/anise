@@ -9,28 +9,22 @@
  *   pnpm test-prompt ingredient "1/2 tsp salt"
  */
 
+import chalk from 'chalk';
+import Table from 'cli-table3';
+import type { UsageStats } from '~~/server/utils/UsageStats.js';
 import { parseIngredient } from '../server/services/prompts/parseIngredient.js';
-
-// ANSI color codes for better output
-const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  cyan: '\x1b[36m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-};
 
 function printUsage() {
   console.log(`
-${colors.bright}Usage:${colors.reset}
+${chalk.bold('Usage:')}
   pnpm test-prompt <type> <input>
 
-${colors.bright}Available prompt types:${colors.reset}
-  ${colors.cyan}ingredient${colors.reset}  - Parse ingredient text into structured components
+${chalk.bold('Available prompt types:')}
+  ${chalk.cyan(
+    'ingredient'
+  )}  - Parse ingredient text into structured components
 
-${colors.bright}Examples:${colors.reset}
+${chalk.bold('Examples:')}
   pnpm test-prompt ingredient "2 cups green bell peppers, diced"
   pnpm test-prompt ingredient "1/2 tsp salt"
   pnpm test-prompt ingredient "3 garlic cloves, minced"
@@ -38,37 +32,75 @@ ${colors.bright}Examples:${colors.reset}
 }
 
 async function testIngredientPrompt(input: string) {
-  console.log(`\n${colors.bright}${colors.cyan}Testing Ingredient Parser${colors.reset}`);
-  console.log(`${colors.yellow}Input:${colors.reset} "${input}"\n`);
+  console.log(`\n${chalk.bold.cyan('Testing Ingredient Parser')}`);
+  console.log(`${chalk.yellow('Input:')} "${input}"\n`);
 
   try {
     const startTime = Date.now();
     const result = await parseIngredient(input);
     const duration = Date.now() - startTime;
 
-    console.log(`${colors.bright}${colors.green}✓ Parsed successfully${colors.reset} (${duration}ms)\n`);
+    console.log(
+      `${chalk.bold.green('✓ Parsed successfully')} (${duration}ms)\n`
+    );
 
-    console.log(`${colors.bright}Result:${colors.reset}`);
-    console.log(`  ${colors.blue}quantity:${colors.reset} ${result.parsed.quantity ?? 'null'}`);
-    console.log(`  ${colors.blue}unit:${colors.reset}     ${result.parsed.unit ?? 'null'}`);
-    console.log(`  ${colors.blue}name:${colors.reset}     ${result.parsed.name}`);
-    console.log(`  ${colors.blue}note:${colors.reset}     ${result.parsed.note ?? 'null'}`);
+    // Display parsed result in a clean table
+    const resultTable = new Table({
+      chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
+      colWidths: [12, 40],
+      style: { 'padding-left': 2, 'padding-right': 0 },
+    });
 
-    console.log(`\n${colors.bright}Usage Statistics:${colors.reset}`);
-    console.log(`  ${colors.magenta}Input tokens:${colors.reset}         ${result.usage.inputTokens.toLocaleString()}`);
-    console.log(`  ${colors.magenta}Output tokens:${colors.reset}        ${result.usage.outputTokens.toLocaleString()}`);
-    console.log(`  ${colors.magenta}Cache creation:${colors.reset}       ${result.usage.cacheCreationInputTokens?.toLocaleString() ?? '0'}`);
-    console.log(`  ${colors.magenta}Cache read:${colors.reset}           ${result.usage.cacheReadInputTokens?.toLocaleString() ?? '0'}`);
-    if (result.usage.estimatedCost !== undefined) {
-      console.log(`  ${colors.magenta}Estimated cost:${colors.reset}       $${result.usage.estimatedCost.toFixed(6)}`);
-    }
+    resultTable.push(
+      [chalk.blue('quantity'), result.parsed.quantity ?? chalk.dim('null')],
+      [chalk.blue('unit'), result.parsed.unit ?? chalk.dim('null')],
+      [chalk.blue('name'), result.parsed.name],
+      [chalk.blue('note'), result.parsed.note ?? chalk.dim('null')]
+    );
+
+    console.log(chalk.bold('Result:'));
+    console.log(resultTable.toString());
+
+    logUsage(result.usage);
     console.log();
   } catch (error) {
-    console.error(`\n${colors.bright}${colors.yellow}✗ Error:${colors.reset}`);
+    console.error(`\n${chalk.bold.yellow('✗ Error:')}`);
     console.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
+
+const logUsage = (usage: UsageStats) => {
+  // Display usage statistics in a clean table
+  const usageTable = new Table({
+    chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
+    colWidths: [20, 20],
+    style: { 'padding-left': 2, 'padding-right': 0 },
+  });
+
+  usageTable.push(
+    [chalk.magenta('Input tokens'), usage.inputTokens.toLocaleString()],
+    [chalk.magenta('Output tokens'), usage.outputTokens.toLocaleString()],
+    [
+      chalk.magenta('Cache creation'),
+      usage.cacheCreationInputTokens?.toLocaleString() ?? '0',
+    ],
+    [
+      chalk.magenta('Cache read'),
+      usage.cacheReadInputTokens?.toLocaleString() ?? '0',
+    ]
+  );
+
+  if (usage.estimatedCost !== undefined) {
+    usageTable.push([
+      chalk.magenta('Estimated cost'),
+      `$${usage.estimatedCost.toFixed(6)}`,
+    ]);
+  }
+
+  console.log(`\n${chalk.bold('Usage Statistics:')}`);
+  console.log(usageTable.toString());
+};
 
 // Main execution
 async function main() {
@@ -91,7 +123,7 @@ async function main() {
     //   break;
 
     default:
-      console.error(`${colors.yellow}Unknown prompt type:${colors.reset} ${promptType}\n`);
+      console.error(`${chalk.yellow('Unknown prompt type:')} ${promptType}\n`);
       printUsage();
       process.exit(1);
   }

@@ -12,7 +12,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "db:studio": "drizzle-kit studio",
-    "test-prompt": "tsx --tsconfig scripts/tsconfig.json --env-file=.env scripts/test-prompt.ts"
+    "test-prompt": "tsx --tsconfig scripts/tsconfig.json --env-file=.env scripts/test-prompt.ts",
+    "batch-parse": "tsx --tsconfig scripts/tsconfig.json --env-file=.env scripts/batch-parse-ingredients.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.44",
@@ -26,7 +27,11 @@
     "@vueuse/core": "^14.0.0",
     "@vueuse/nuxt": "^14.0.0",
     "ai": "^5.0.93",
+    "chalk": "^5.6.2",
     "cheerio": "^1.1.2",
+    "cli-table3": "^0.6.5",
+    "csv-parse": "^6.1.0",
+    "csv-stringify": "^6.6.0",
     "drizzle-orm": "^0.44.4",
     "eslint": "^9.0.0",
     "nuxt": "^4.0.1",
