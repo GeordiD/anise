@@ -6,6 +6,7 @@ import {
   foreignKey,
   index,
   integer,
+  json,
   pgEnum,
   pgTable,
   serial,
@@ -253,6 +254,34 @@ export const shoppingListItems = pgTable(
     }),
   ]
 );
+
+// === Internal ===
+
+export const job = pgTable('job', {
+  id: serial('id').primaryKey(),
+  workflowName: text('workflow_name').notNull(),
+  metadata: json('metadata'),
+});
+
+export const step = pgTable(
+  'step',
+  {
+    id: serial('id').primaryKey(),
+    jobId: integer('job_id').notNull(),
+    name: text('name').notNull(),
+    input: json('input'),
+    output: json('output'),
+    error: json('error'),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.jobId],
+      foreignColumns: [job.id],
+    }),
+  ]
+);
+
+// ================
 
 // Relations
 export const recipesRelations = relations(recipes, ({ many, one }) => ({

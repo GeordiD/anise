@@ -50,6 +50,13 @@
       "when": 1763181061505,
       "tag": "0006_typical_the_spike",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1763872140850,
+      "tag": "0007_tough_riptide",
+      "breakpoints": true
     }
   ]
 }
