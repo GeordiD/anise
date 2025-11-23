@@ -1,9 +1,6 @@
-import { setStepMetadata } from '~~/server/jobs/helpers/context';
-import type { LlmStepMetadata } from '~~/server/jobs/helpers/llmStep';
 import type { RecipeData } from '~~/server/schemas/recipeSchema';
 import { recipeSchema } from '~~/server/schemas/recipeSchema';
 import { llmService } from '~~/server/services/llmService';
-import { UsageStats } from '~~/server/utils/UsageStats';
 
 export async function extractRecipe(content: string): Promise<{
   recipe: RecipeData;
@@ -31,10 +28,6 @@ ${content}
       temperature: 0.1,
       maxRetries: 3,
     });
-
-    const usage = UsageStats.FromLlm(result);
-
-    setStepMetadata<LlmStepMetadata>({ usage });
 
     return {
       recipe: result.object,
