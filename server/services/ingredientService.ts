@@ -1,5 +1,4 @@
 import { eq, ilike, or, sql } from 'drizzle-orm';
-import { UsageStats } from '~~/server/utils/UsageStats';
 import { getDb } from '../db';
 import { ingredients } from '../db/schema';
 import { matchIngredient } from './prompts/matchIngredient';
@@ -48,7 +47,6 @@ class IngredientService {
    */
   async createOrMatchIngredient(parsedName: string): Promise<{
     ingredient: { id: number; name: string };
-    usage: UsageStats;
   }> {
     const db = await getDb();
 
@@ -57,7 +55,6 @@ class IngredientService {
     if (exactMatch) {
       return {
         ingredient: exactMatch,
-        usage: new UsageStats(),
       };
     }
 
@@ -65,7 +62,7 @@ class IngredientService {
     const candidates = await this.findSimilarIngredients(parsedName);
 
     // Step 3: Use LLM to match against candidates
-    const { match, usage } = await matchIngredient(parsedName, candidates);
+    const { match } = await matchIngredient(parsedName, candidates);
 
     // Step 4: Either return matched ingredient or create new one
     if (match.matchedId !== null) {
@@ -85,7 +82,6 @@ class IngredientService {
 
       return {
         ingredient: existingIngredient,
-        usage,
       };
     } else {
       // No match - create new standardized ingredient
@@ -105,7 +101,6 @@ class IngredientService {
 
       return {
         ingredient: newIngredient,
-        usage,
       };
     }
   }

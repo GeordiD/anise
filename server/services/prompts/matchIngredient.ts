@@ -2,7 +2,6 @@ import { generateObject } from 'ai';
 import type { IngredientMatch } from '~~/server/schemas/ingredientSchema';
 import { ingredientMatchSchema } from '~~/server/schemas/ingredientSchema';
 import { llmService } from '~~/server/services/llmService';
-import { UsageStats } from '~~/server/utils/UsageStats';
 
 /**
  * System prompt for ingredient matching
@@ -52,7 +51,6 @@ export async function matchIngredient(
   candidates: CandidateIngredient[]
 ): Promise<{
   match: IngredientMatch;
-  usage: UsageStats;
 }> {
   const candidatesText =
     candidates.length > 0
@@ -90,7 +88,6 @@ ${candidatesText}`,
 
     return {
       match: result.object,
-      usage: UsageStats.FromLlm(result),
     };
   } catch (error) {
     throw createError({

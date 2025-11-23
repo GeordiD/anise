@@ -18,19 +18,31 @@ export function getJobId(): number | undefined {
 export function requireJobId(): number {
   const jobId = getJobId();
   if (jobId === undefined) {
-    throw new Error('No job context available. This function must be called within a job.');
+    throw new Error(
+      'No job context available. This function must be called within a job.'
+    );
   }
   return jobId;
 }
 
-export function getStepContext<TMetadata = unknown>(): StepContext<TMetadata> | undefined {
+export function hasStepContext(): boolean {
+  return !!stepContext.getStore();
+}
+
+export function getStepContext<TMetadata = unknown>():
+  | StepContext<TMetadata>
+  | undefined {
   return stepContext.getStore() as StepContext<TMetadata> | undefined;
 }
 
-export function requireStepContext<TMetadata = unknown>(): StepContext<TMetadata> {
+export function requireStepContext<
+  TMetadata = unknown
+>(): StepContext<TMetadata> {
   const context = getStepContext<TMetadata>();
   if (!context) {
-    throw new Error('No step context available. This function must be called within a step.');
+    throw new Error(
+      'No step context available. This function must be called within a step.'
+    );
   }
   return context;
 }
@@ -44,11 +56,4 @@ export function setStepMetadata<TMetadata extends object = object>(
 ): void {
   const context = requireStepContext<TMetadata>();
   Object.assign(context.metadata as object, updates);
-}
-
-export function updateStepMetadata<TMetadata = unknown>(
-  updater: (current: TMetadata) => TMetadata
-): void {
-  const context = requireStepContext<TMetadata>();
-  context.metadata = updater(context.metadata);
 }

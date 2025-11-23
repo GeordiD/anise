@@ -1,12 +1,18 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
-import type { UsageStats } from '~~/server/utils/UsageStats';
+import { generateObject, type GenerateObjectResult } from 'ai';
+import type { z } from 'zod';
+import {
+  hasStepContext,
+  setStepMetadata,
+} from '~~/server/jobs/helpers/context';
+import type { LlmStepMetadata } from '~~/server/jobs/helpers/llmStep';
+import { UsageStats } from '~~/server/utils/UsageStats';
 import type { RecipeData } from '../schemas/recipeSchema';
 
 export interface RecipeExtractionResult {
   recipe: RecipeData;
   usage: UsageStats;
 }
-
 export class LLMService {
   anthropic: ReturnType<typeof createAnthropic>;
 
@@ -19,6 +25,28 @@ export class LLMService {
     this.anthropic = createAnthropic({
       apiKey,
     });
+  }
+
+  async generateObject<SCHEMA extends z.ZodType>(
+    props: Omit<Parameters<typeof generateObject>[0], 'schema' | 'model'> & {
+      schema: SCHEMA;
+      model?: Parameters<typeof generateObject>[0]['model'];
+    },
+  ): Promise<GenerateObjectResult<z.output<SCHEMA>>> {
+    const result = await generateObject({
+      maxRetries: 3,
+      temperature: 0.1,
+      model: this.anthropic('claude-sonnet-4-20250514'),
+      ...props,
+    } as Parameters<typeof generateObject>[0]);
+
+    if (hasStepContext()) {
+      const usage = UsageStats.FromLlm(result);
+
+      setStepMetadata<LlmStepMetadata>({ usage });
+    }
+
+    return result as GenerateObjectResult<z.output<SCHEMA>>;
   }
 }
 

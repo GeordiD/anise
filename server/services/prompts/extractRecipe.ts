@@ -1,5 +1,5 @@
-import { generateObject } from 'ai';
-import { useUsageStats } from '~~/server/jobs/helpers/llmStep';
+import { setStepMetadata } from '~~/server/jobs/helpers/context';
+import type { LlmStepMetadata } from '~~/server/jobs/helpers/llmStep';
 import type { RecipeData } from '~~/server/schemas/recipeSchema';
 import { recipeSchema } from '~~/server/schemas/recipeSchema';
 import { llmService } from '~~/server/services/llmService';
@@ -7,7 +7,6 @@ import { UsageStats } from '~~/server/utils/UsageStats';
 
 export async function extractRecipe(content: string): Promise<{
   recipe: RecipeData;
-  usage: UsageStats;
 }> {
   const prompt = `Extract recipe information from the provided content.
 
@@ -25,7 +24,7 @@ ${content}
 </content>`;
 
   try {
-    const result = await generateObject({
+    const result = await llmService.generateObject({
       model: llmService.anthropic('claude-sonnet-4-20250514'),
       schema: recipeSchema,
       prompt,
@@ -33,15 +32,12 @@ ${content}
       maxRetries: 3,
     });
 
-    const { set } = useUsageStats();
-
     const usage = UsageStats.FromLlm(result);
 
-    set(usage);
+    setStepMetadata<LlmStepMetadata>({ usage });
 
     return {
       recipe: result.object,
-      usage,
     };
   } catch (error) {
     throw createError({

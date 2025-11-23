@@ -2,7 +2,6 @@ import * as cheerio from 'cheerio';
 import { ingredientService } from '~~/server/services/ingredientService';
 import { extractRecipe } from '~~/server/services/prompts/extractRecipe';
 import { parseIngredient } from '~~/server/services/prompts/parseIngredient';
-import { UsageStats } from '~~/server/utils/UsageStats';
 import { getDb } from '../db';
 import {
   recipeIngredientGroups,
@@ -10,7 +9,6 @@ import {
   recipeInstructions,
   recipeNotes,
   recipes,
-  tokenUsage,
 } from '../db/schema';
 import type { ParsedIngredient } from '../schemas/ingredientSchema';
 import type { RecipeData } from '../schemas/recipeSchema';
@@ -45,7 +43,6 @@ export interface RecipeContentResult {
   success: boolean;
   url: string;
   recipe: RecipeData & { id: number };
-  usage?: UsageStats;
 }
 
 class RecipeScraper {
@@ -54,24 +51,17 @@ class RecipeScraper {
     const extractResult = await extractRecipe(cleanedContent);
 
     // Map ingredients to standardized format
-    const { recipe: mappedRecipe, usage: mappingUsage } =
-      await this.mapIngredients(extractResult.recipe);
-
-    // Combine usage stats from extraction and mapping
-    const totalUsage = extractResult.usage.addFromUsageStats(mappingUsage);
+    const { recipe: mappedRecipe } = await this.mapIngredients(
+      extractResult.recipe
+    );
 
     // Save recipe to database
-    const savedRecipe = await this.saveRecipeToDatabase(
-      mappedRecipe,
-      url,
-      totalUsage
-    );
+    const savedRecipe = await this.saveRecipeToDatabase(mappedRecipe, url);
 
     return {
       success: true,
       url: url,
       recipe: savedRecipe,
-      usage: totalUsage,
     };
   }
 
@@ -145,9 +135,8 @@ class RecipeScraper {
    */
   private async mapIngredients(
     recipe: RecipeData
-  ): Promise<{ recipe: RecipeDataWithMappedIngredients; usage: UsageStats }> {
+  ): Promise<{ recipe: RecipeDataWithMappedIngredients }> {
     const mappedGroups: MappedIngredientGroup[] = [];
-    const totalUsage = new UsageStats();
 
     // Process each ingredient group
     for (const group of recipe.ingredients) {
@@ -157,29 +146,11 @@ class RecipeScraper {
       for (const rawIngredient of group.items) {
         try {
           // Step 1: Parse the raw ingredient text
-          const { parsed, usage: parseUsage } = await parseIngredient(
-            rawIngredient
-          );
-
-          // Accumulate parsing usage
-          totalUsage.inputTokens += parseUsage.inputTokens;
-          totalUsage.outputTokens += parseUsage.outputTokens;
-          totalUsage.totalTokens += parseUsage.totalTokens;
-          totalUsage.inputCost += parseUsage.inputCost;
-          totalUsage.outputCost += parseUsage.outputCost;
-          totalUsage.totalCost += parseUsage.totalCost;
+          const { parsed } = await parseIngredient(rawIngredient);
 
           // Step 2: Match or create standardized ingredient
-          const { ingredient, usage: matchUsage } =
+          const { ingredient } =
             await ingredientService.createOrMatchIngredient(parsed.name);
-
-          // Accumulate matching usage
-          totalUsage.inputTokens += matchUsage.inputTokens;
-          totalUsage.outputTokens += matchUsage.outputTokens;
-          totalUsage.totalTokens += matchUsage.totalTokens;
-          totalUsage.inputCost += matchUsage.inputCost;
-          totalUsage.outputCost += matchUsage.outputCost;
-          totalUsage.totalCost += matchUsage.totalCost;
 
           // Step 3: Store the mapped data
           mappedItems.push({
@@ -210,14 +181,12 @@ class RecipeScraper {
         ...recipe,
         ingredients: mappedGroups,
       },
-      usage: totalUsage,
     };
   }
 
   private async saveRecipeToDatabase(
     recipeData: RecipeData | RecipeDataWithMappedIngredients,
-    sourceUrl: string,
-    usage: UsageStats
+    sourceUrl: string
   ): Promise<RecipeData & { id: number }> {
     const db = await getDb();
 
@@ -338,17 +307,6 @@ class RecipeScraper {
           }
         }
       }
-
-      // 5. Insert token usage
-      await tx.insert(tokenUsage).values({
-        recipeId: savedRecipe.id,
-        inputTokens: usage.inputTokens,
-        outputTokens: usage.outputTokens,
-        totalTokens: usage.totalTokens,
-        inputCost: usage.inputCost.toString(),
-        outputCost: usage.outputCost.toString(),
-        totalCost: usage.totalCost.toString(),
-      });
 
       // Return the recipe data with the database ID
       return {

@@ -2,7 +2,6 @@ import { generateObject } from 'ai';
 import type { ParsedIngredient } from '~~/server/schemas/ingredientSchema';
 import { parsedIngredientSchema } from '~~/server/schemas/ingredientSchema';
 import { llmService } from '~~/server/services/llmService';
-import { UsageStats } from '~~/server/utils/UsageStats';
 
 /**
  * System prompt for ingredient parsing
@@ -50,7 +49,6 @@ Examples:
  */
 export async function parseIngredient(rawIngredient: string): Promise<{
   parsed: ParsedIngredient;
-  usage: UsageStats;
 }> {
   try {
     const result = await generateObject({
@@ -80,7 +78,6 @@ export async function parseIngredient(rawIngredient: string): Promise<{
 
     return {
       parsed: result.object,
-      usage: UsageStats.FromLlm(result),
     };
   } catch (error) {
     throw createError({
