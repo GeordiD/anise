@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { getDb } from '~~/server/db';
 import { job as jobTable } from '~~/server/db/schema';
 import { jobContext } from './context';
@@ -24,10 +25,24 @@ export async function job<T>(
     throw new Error('Failed to create job');
   }
 
-  const result = await jobContext.run({ jobId: insertedJob.id }, () => fn());
+  try {
+    const result = await jobContext.run({ jobId: insertedJob.id }, () => fn());
 
-  return {
-    result,
-    jobId: insertedJob.id,
-  };
+    await db
+      .update(jobTable)
+      .set({ completedAt: new Date() })
+      .where(eq(jobTable.id, insertedJob.id));
+
+    return {
+      result,
+      jobId: insertedJob.id,
+    };
+  } catch (error) {
+    await db
+      .update(jobTable)
+      .set({ completedAt: new Date() })
+      .where(eq(jobTable.id, insertedJob.id));
+
+    throw error;
+  }
 }

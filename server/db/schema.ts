@@ -261,6 +261,8 @@ export const job = pgTable('job', {
   id: serial('id').primaryKey(),
   workflowName: text('workflow_name').notNull(),
   metadata: json('metadata'),
+  startedAt: timestamp('started_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at'),
 });
 
 export const step = pgTable(
@@ -273,6 +275,8 @@ export const step = pgTable(
     output: json('output'),
     error: json('error'),
     metadata: json('metadata'),
+    startedAt: timestamp('started_at').defaultNow().notNull(),
+    completedAt: timestamp('completed_at'),
   },
   (table) => [
     foreignKey({
