@@ -3,7 +3,7 @@ import { useUsageStats } from '~~/server/jobs/helpers/llmStep';
 import type { RecipeData } from '~~/server/schemas/recipeSchema';
 import { recipeSchema } from '~~/server/schemas/recipeSchema';
 import { llmService } from '~~/server/services/llmService';
-import type { UsageStats } from '~~/server/utils/UsageStats';
+import { UsageStats } from '~~/server/utils/UsageStats';
 
 export async function extractRecipe(content: string): Promise<{
   recipe: RecipeData;
@@ -35,11 +35,13 @@ ${content}
 
     const { set } = useUsageStats();
 
-    set(llmService.calculateUsage(result));
+    const usage = UsageStats.FromLlm(result);
+
+    set(usage);
 
     return {
       recipe: result.object,
-      usage: llmService.calculateUsage(result),
+      usage,
     };
   } catch (error) {
     throw createError({

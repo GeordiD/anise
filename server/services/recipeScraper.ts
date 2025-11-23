@@ -2,8 +2,7 @@ import * as cheerio from 'cheerio';
 import { ingredientService } from '~~/server/services/ingredientService';
 import { extractRecipe } from '~~/server/services/prompts/extractRecipe';
 import { parseIngredient } from '~~/server/services/prompts/parseIngredient';
-import type { UsageStats } from '~~/server/utils/UsageStats';
-import { createUsageStats } from '~~/server/utils/UsageStats';
+import { UsageStats } from '~~/server/utils/UsageStats';
 import { getDb } from '../db';
 import {
   recipeIngredientGroups,
@@ -59,15 +58,7 @@ class RecipeScraper {
       await this.mapIngredients(extractResult.recipe);
 
     // Combine usage stats from extraction and mapping
-    const totalUsage: UsageStats = {
-      inputTokens: extractResult.usage.inputTokens + mappingUsage.inputTokens,
-      outputTokens:
-        extractResult.usage.outputTokens + mappingUsage.outputTokens,
-      totalTokens: extractResult.usage.totalTokens + mappingUsage.totalTokens,
-      inputCost: extractResult.usage.inputCost + mappingUsage.inputCost,
-      outputCost: extractResult.usage.outputCost + mappingUsage.outputCost,
-      totalCost: extractResult.usage.totalCost + mappingUsage.totalCost,
-    };
+    const totalUsage = extractResult.usage.addFromUsageStats(mappingUsage);
 
     // Save recipe to database
     const savedRecipe = await this.saveRecipeToDatabase(
@@ -156,7 +147,7 @@ class RecipeScraper {
     recipe: RecipeData
   ): Promise<{ recipe: RecipeDataWithMappedIngredients; usage: UsageStats }> {
     const mappedGroups: MappedIngredientGroup[] = [];
-    const totalUsage = createUsageStats();
+    const totalUsage = new UsageStats();
 
     // Process each ingredient group
     for (const group of recipe.ingredients) {

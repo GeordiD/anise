@@ -2,7 +2,7 @@ import { generateObject } from 'ai';
 import type { IngredientMatch } from '~~/server/schemas/ingredientSchema';
 import { ingredientMatchSchema } from '~~/server/schemas/ingredientSchema';
 import { llmService } from '~~/server/services/llmService';
-import type { UsageStats } from '~~/server/utils/UsageStats';
+import { UsageStats } from '~~/server/utils/UsageStats';
 
 /**
  * System prompt for ingredient matching
@@ -90,7 +90,7 @@ ${candidatesText}`,
 
     return {
       match: result.object,
-      usage: llmService.calculateUsage(result),
+      usage: UsageStats.FromLlm(result),
     };
   } catch (error) {
     throw createError({

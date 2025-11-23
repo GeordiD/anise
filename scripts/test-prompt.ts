@@ -91,13 +91,6 @@ const logUsage = (usage: UsageStats) => {
     ]
   );
 
-  if (usage.estimatedCost !== undefined) {
-    usageTable.push([
-      chalk.magenta('Estimated cost'),
-      `$${usage.estimatedCost.toFixed(6)}`,
-    ]);
-  }
-
   console.log(`\n${chalk.bold('Usage Statistics:')}`);
   console.log(usageTable.toString());
 };

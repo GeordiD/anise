@@ -1,6 +1,5 @@
 import { eq, ilike, or, sql } from 'drizzle-orm';
-import type { UsageStats } from '~~/server/utils/UsageStats';
-import { createUsageStats } from '~~/server/utils/UsageStats';
+import { UsageStats } from '~~/server/utils/UsageStats';
 import { getDb } from '../db';
 import { ingredients } from '../db/schema';
 import { matchIngredient } from './prompts/matchIngredient';
@@ -58,7 +57,7 @@ class IngredientService {
     if (exactMatch) {
       return {
         ingredient: exactMatch,
-        usage: createUsageStats(),
+        usage: new UsageStats(),
       };
     }
 
