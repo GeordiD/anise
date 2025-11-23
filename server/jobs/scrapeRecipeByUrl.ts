@@ -1,10 +1,11 @@
 import * as cheerio from 'cheerio';
+import { llmStep } from '~~/server/jobs/helpers/llmStep';
 import { step } from '~~/server/jobs/helpers/step';
 import { extractRecipe } from '~~/server/services/prompts/extractRecipe';
 
 export async function scrapeRecipeByUrl(url: string) {
   const cleanedContent = await step('scrape-data', fetchAndCleanContent, url);
-  const extractedRecipe = await step(
+  const extractedRecipe = await llmStep(
     'extract-recipe',
     extractRecipe,
     cleanedContent

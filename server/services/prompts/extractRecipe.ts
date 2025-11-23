@@ -1,4 +1,5 @@
 import { generateObject } from 'ai';
+import { useUsageStats } from '~~/server/jobs/helpers/llmStep';
 import type { RecipeData } from '~~/server/schemas/recipeSchema';
 import { recipeSchema } from '~~/server/schemas/recipeSchema';
 import { llmService } from '~~/server/services/llmService';
@@ -31,6 +32,10 @@ ${content}
       temperature: 0.1,
       maxRetries: 3,
     });
+
+    const { set } = useUsageStats();
+
+    set(llmService.calculateUsage(result));
 
     return {
       recipe: result.object,

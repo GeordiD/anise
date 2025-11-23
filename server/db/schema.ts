@@ -272,6 +272,7 @@ export const step = pgTable(
     input: json('input'),
     output: json('output'),
     error: json('error'),
+    metadata: json('metadata'),
   },
   (table) => [
     foreignKey({
