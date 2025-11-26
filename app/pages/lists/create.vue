@@ -173,13 +173,16 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-col h-screen max-w-[414px] mx-auto">
-    <!-- Sticky Header -->
-    <header class="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-4">
-      <h1 class="text-2xl font-bold text-default">Select Ingredients</h1>
+    <!-- Header -->
+    <header class="pb-4">
+      <!-- Progress indicator -->
+        <div class="text-sm text-muted">
+          Recipe {{ currentStep + 1 }} of {{ recipes.length }}
+        </div>
     </header>
 
-    <!-- Main Content - Scrollable -->
-    <main class="flex-1 overflow-y-auto px-4 py-6">
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto">
       <!-- Loading state -->
       <div v-if="pending || recipesLoading" class="flex justify-center py-12">
         <div class="text-muted">Loading recipes...</div>
@@ -205,7 +208,7 @@ onMounted(async () => {
       <div v-else-if="currentRecipe" class="space-y-6">
         <!-- Recipe title and subtitle -->
         <div class="space-y-2">
-          <h2 class="text-2xl font-bold text-default">
+          <h2 class="text-xl font-bold text-default">
             {{ currentRecipe.name }}
           </h2>
           <p class="text-muted">
@@ -213,10 +216,7 @@ onMounted(async () => {
           </p>
         </div>
 
-        <!-- Progress indicator -->
-        <div class="text-sm text-muted">
-          Recipe {{ currentStep + 1 }} of {{ recipes.length }}
-        </div>
+        
 
         <!-- Ingredients list -->
         <div class="space-y-3">
@@ -254,15 +254,12 @@ onMounted(async () => {
     </main>
 
     <!-- Fixed Footer with navigation buttons -->
-    <footer class="sticky bottom-0 z-10 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-4">
+    <footer class="sticky bottom-0 z-10 bg-default  py-4">
       <div class="flex gap-3">
         <!-- Back button (hidden on first step) -->
         <UButton
           v-if="!isFirstStep"
-          color="neutral"
-          variant="outline"
           size="lg"
-          class="flex-1"
           :disabled="submitting"
           @click="goBack"
         >
@@ -272,8 +269,10 @@ onMounted(async () => {
         <!-- Next/Finish button -->
         <UButton
           color="primary"
+          variant="solid"
           size="lg"
-          :class="isFirstStep ? 'w-full' : 'flex-1'"
+          :block="isFirstStep"
+          :class="!isFirstStep ? 'flex-1 justify-center' : ''"
           :disabled="submitting || recipesLoading || !currentRecipe"
           :loading="submitting"
           @click="goNext"

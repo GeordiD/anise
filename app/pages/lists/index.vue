@@ -61,12 +61,22 @@ function goBackToMealPlan() {
 
 <template>
   <div class="flex flex-col h-screen max-w-[414px] mx-auto">
-    <!-- Sticky Header -->
-    <header class="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-4">
-      <h1 class="text-2xl font-bold text-default">Shopping List</h1>
+    <!-- Header -->
+    <header class="y-4">
+      <UButton
+        color="primary"
+        variant="ghost"
+        icon="i-heroicons-arrow-left"
+        size="lg"
+        class="px-0"
+        @click="goBackToMealPlan"
+      >
+        Back to Meal Plan
+      </UButton>
+      <h1 class="text-2xl font-bold text-default pt-2">Shopping List</h1>
     </header>
 
-    <!-- Main Content - Scrollable -->
+    <!-- Main Content -->
     <main class="flex-1 overflow-y-auto px-4 py-4">
       <!-- Loading state -->
       <div v-if="pending" class="flex justify-center py-12">
@@ -104,7 +114,7 @@ function goBackToMealPlan() {
             class="flex-shrink-0 mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors"
             :class="
               isChecked(item.id, item.checked)
-                ? 'border-primary-500 bg-primary-500'
+                ? 'border-secondary bg-primary'
                 : 'border-gray-300 dark:border-gray-600'
             "
             @click="toggleItemChecked(item.id, isChecked(item.id, item.checked))"
@@ -144,17 +154,5 @@ function goBackToMealPlan() {
         </li>
       </ul>
     </main>
-
-    <!-- Fixed Footer -->
-    <footer class="sticky bottom-0 z-10 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-4">
-      <UButton
-        color="primary"
-        size="lg"
-        block
-        @click="goBackToMealPlan"
-      >
-        Back to Meal Plan
-      </UButton>
-    </footer>
   </div>
 </template>
