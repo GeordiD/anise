@@ -3,7 +3,7 @@ import { getDb } from '~~/server/db';
 import { step as stepTable } from '~~/server/db/schema';
 import { requireJobId, stepContext } from './context';
 
-export async function step<TInput, TOutput, TMetadata = unknown>(
+export async function step<TMetadata, TInput, TOutput>(
   name: string,
   fn: (_props: TInput) => Promise<TOutput>,
   props: TInput,

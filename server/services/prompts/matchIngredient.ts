@@ -46,10 +46,13 @@ interface CandidateIngredient {
  * Match a parsed ingredient name against existing standardized ingredients
  * Uses Anthropic's prompt caching to reduce costs when processing multiple ingredients
  */
-export async function matchIngredient(
-  parsedName: string,
-  candidates: CandidateIngredient[]
-): Promise<{
+export async function matchIngredient({
+  parsedName,
+  candidates,
+}: {
+  parsedName: string;
+  candidates: CandidateIngredient[];
+}): Promise<{
   match: IngredientMatch;
 }> {
   const candidatesText =

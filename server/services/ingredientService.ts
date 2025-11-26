@@ -8,7 +8,7 @@ class IngredientService {
    * Find ingredients similar to the given name using fuzzy text search
    * Uses ILIKE for case-insensitive pattern matching
    */
-  private async findSimilarIngredients(
+  async findSimilarIngredients(
     name: string,
     limit: number = 20
   ): Promise<{ id: number; name: string }[]> {
@@ -33,11 +33,11 @@ class IngredientService {
     return similarIngredients;
   }
 
-  private async findIngredientByName(name: string) {
+  async findIngredientByName(name: string) {
     const db = await getDb();
 
     return await db.query.ingredients.findFirst({
-      where: eq(ingredients.name, name.toLowerCase().trim()),
+      where: eq(ingredients.name, name),
     });
   }
 
@@ -62,7 +62,7 @@ class IngredientService {
     const candidates = await this.findSimilarIngredients(parsedName);
 
     // Step 3: Use LLM to match against candidates
-    const { match } = await matchIngredient(parsedName, candidates);
+    const { match } = await matchIngredient({ parsedName, candidates });
 
     // Step 4: Either return matched ingredient or create new one
     if (match.matchedId !== null) {
@@ -105,20 +105,17 @@ class IngredientService {
     }
   }
 
-  /**
-   * Merge duplicate ingredients (for future use)
-   * Moves all references from sourceId to targetId, then deletes the source
-   */
-  async deduplicateIngredients(
-    _sourceId: number,
-    _targetId: number
-  ): Promise<void> {
-    // This would need to update all recipe_ingredients that reference sourceId
-    // For now, just a placeholder for future implementation
-    throw createError({
-      statusCode: 501,
-      statusMessage: 'Deduplication not yet implemented',
-    });
+  async createIngredient(name: string) {
+    const db = await getDb();
+
+    const [newIngredient] = await db
+      .insert(ingredients)
+      .values({
+        name,
+      })
+      .returning();
+
+    return newIngredient;
   }
 }
 
