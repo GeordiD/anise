@@ -33,7 +33,9 @@
   --ui-text: var(--color-cream-600);
   --ui-text-inverted: var(--color-cream-200);
   --ui-text-muted: var(--color-cream-500);
+  --ui-text-dimmed: var(--color-cream-400);
   --ui-border: var(--color-cream-300);
+  --ui-border-accented: var(--color-cream-300);
 }
 
 .dark {
@@ -48,5 +50,7 @@
   --ui-text: var(--color-cream-100);
   --ui-text-inverted: var(--color-cream-600);
   --ui-text-muted: var(--color-cream-200);
+  --ui-text-dimmed: var(--color-cream-300);
   --ui-border: var(--color-cream-500);
+  --ui-border-accented: var(--color-cream-500);
 }

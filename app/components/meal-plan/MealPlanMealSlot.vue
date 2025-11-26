@@ -36,8 +36,6 @@ async function handleRemoveMeal(mealId: number) {
         {{ mealLabel }}
       </div>
       <UButton
-        color="neutral"
-        variant="outline"
         class="flex-1 justify-start"
         @click="
           () => {

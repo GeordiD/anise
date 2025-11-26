@@ -136,11 +136,14 @@ function resetState() {
 
         <template #footer>
           <div class="flex justify-end gap-2">
-            <UButton color="neutral" variant="ghost" @click="handleClose">
+            <UButton 
+              @click="handleClose">
               Cancel
             </UButton>
             <UButton
               color="primary"
+              variant="solid"
+              size="md"
               :disabled="selectedRecipeIds.length === 0"
               @click="handleSelect"
             >
