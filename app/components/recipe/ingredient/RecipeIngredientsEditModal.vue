@@ -79,6 +79,7 @@ async function handleSave() {
 
   try {
     // Save all modified ingredients
+    // @todo this should be a batch
     await Promise.all(
       modifiedIngredients.value.map((ingredient) =>
         $fetch(`/api/ingredients/${ingredient.id}/substitution`, {
