@@ -1,4 +1,4 @@
-import { addRecipeByUrl } from '~~/server/jobs/addRecipeWorkflow';
+import { addRecipeByUrl } from '~~/server/jobs/add-recipe';
 
 interface RecipeFetchRequest {
   url: string;
@@ -27,14 +27,11 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Use recipe service to fetch and clean content
-  // const result = await recipeScraper.fetchByUrl(url);
-  // return result;
-
-  await addRecipeByUrl(url);
+  const { id } = await addRecipeByUrl(url);
 
   return {
     success: true,
+    id,
   };
 });
 

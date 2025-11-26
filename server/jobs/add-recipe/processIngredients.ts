@@ -7,22 +7,58 @@ import { ingredientService } from '~~/server/services/ingredientService';
 import { matchIngredient } from '~~/server/services/prompts/matchIngredient';
 import { parseIngredient } from '~~/server/services/prompts/parseIngredient';
 
-type MappedIngredient = {
+export type MappedIngredient = {
   ingredient: string;
   ingredientId: number;
 } & ParsedIngredient;
 
+export interface MappedIngredientGroup {
+  name?: string;
+  mappedItems: MappedIngredient[];
+}
+
 export async function processIngredients({
   ingredients: ingredientGroups,
-}: Pick<RecipeData, 'ingredients'>) {
+}: Pick<RecipeData, 'ingredients'>): Promise<MappedIngredientGroup[]> {
   const limit = pLimit(5);
-  const ingredientNames = ingredientGroups.flatMap(({ items }) => items);
-
-  const tasks = ingredientNames.map((name) =>
-    limit(() => step('process-ingredient', processIngredient, name))
+  const ingredientNames = ingredientGroups.flatMap(({ items }, i) =>
+    items.map((name) => ({ name, groupIndex: i }))
   );
 
-  return await Promise.all(tasks);
+  const tasks = ingredientNames.map(({ name, groupIndex }) =>
+    limit(() =>
+      step(
+        'process-ingredient',
+        // tag each processed ingredient with the group index
+        async ({
+          rawName,
+          groupIndex,
+        }: {
+          rawName: string;
+          groupIndex: number;
+        }) => {
+          const mappedIngredient = await processIngredient(rawName);
+          return {
+            mappedIngredient,
+            groupIndex,
+          };
+        },
+        {
+          rawName: name,
+          groupIndex,
+        }
+      )
+    )
+  );
+
+  const ingredientResults = await Promise.all(tasks);
+
+  return ingredientGroups.map((group, i) => ({
+    mappedItems: ingredientResults
+      .filter((x) => x.groupIndex === i)
+      .map((x) => x.mappedIngredient),
+    name: group.name,
+  }));
 }
 
 export async function processIngredient(
