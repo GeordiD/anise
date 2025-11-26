@@ -1,26 +1,21 @@
 <script lang="ts" setup>
 import type { GetRecipeByIdResponse } from '~~/server/api/recipes/[id].get';
 
-defineProps<{
+const { ingredient } = defineProps<{
   ingredient: GetRecipeByIdResponse['ingredients'][number]['items'][number];
 }>();
-
-const isEditing = ref(false);
 </script>
 
 <template>
-  <Fragment>
-    <RecipeIngredientView
-      v-if="!isEditing"
-      :ingredient="ingredient"
-      @edit-clicked="isEditing = true"
-    />
-    <RecipeIngredientEdit
-      v-if="isEditing"
-      :ingredient="ingredient"
-      @close="isEditing = false"
-    />
-  </Fragment>
+  <li class="flex items-start min-h-8">
+    <span
+      :class="{
+        'line-through': ingredient.isUnused,
+        'text-primary-700 dark:text-primary-300': ingredient.isSubstituted,
+      }"
+      >{{ ingredient.name }}</span
+    >
+  </li>
 </template>
 
 <style></style>
