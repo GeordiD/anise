@@ -33,6 +33,7 @@ ${content}
       recipe: result.object,
     };
   } catch (error) {
+    console.error(error);
     throw createError({
       statusCode: 500,
       statusMessage: `Failed to extract recipe: ${

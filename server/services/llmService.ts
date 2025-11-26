@@ -31,7 +31,7 @@ export class LLMService {
     props: Omit<Parameters<typeof generateObject>[0], 'schema' | 'model'> & {
       schema: SCHEMA;
       model?: Parameters<typeof generateObject>[0]['model'];
-    },
+    }
   ): Promise<GenerateObjectResult<z.output<SCHEMA>>> {
     const result = await generateObject({
       maxRetries: 3,

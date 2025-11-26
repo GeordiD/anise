@@ -1,4 +1,3 @@
-import { generateObject } from 'ai';
 import type { IngredientMatch } from '~~/server/schemas/ingredientSchema';
 import { ingredientMatchSchema } from '~~/server/schemas/ingredientSchema';
 import { llmService } from '~~/server/services/llmService';
@@ -61,8 +60,7 @@ export async function matchIngredient({
       : 'No existing ingredients in database yet.';
 
   try {
-    const result = await generateObject({
-      model: llmService.anthropic('claude-sonnet-4-20250514'),
+    const result = await llmService.generateObject({
       schema: ingredientMatchSchema,
       messages: [
         {
@@ -85,8 +83,6 @@ ${candidatesText}`,
           ],
         },
       ],
-      temperature: 0.1,
-      maxRetries: 2,
     });
 
     return {

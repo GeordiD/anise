@@ -1,4 +1,3 @@
-import { generateObject } from 'ai';
 import type { ParsedIngredient } from '~~/server/schemas/ingredientSchema';
 import { parsedIngredientSchema } from '~~/server/schemas/ingredientSchema';
 import { llmService } from '~~/server/services/llmService';
@@ -51,8 +50,7 @@ export async function parseIngredient(rawIngredient: string): Promise<{
   parsed: ParsedIngredient;
 }> {
   try {
-    const result = await generateObject({
-      model: llmService.anthropic('claude-sonnet-4-20250514'),
+    const result = await llmService.generateObject({
       schema: parsedIngredientSchema,
       messages: [
         {
@@ -72,8 +70,6 @@ export async function parseIngredient(rawIngredient: string): Promise<{
           ],
         },
       ],
-      temperature: 0.1,
-      maxRetries: 2,
     });
 
     return {

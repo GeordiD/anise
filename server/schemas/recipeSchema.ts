@@ -51,10 +51,10 @@ export const recipeSchema = z.object({
       z.object({
         name: z
           .string()
-          .max(100, 'Group name too long')
+          .max(200, 'Group name too long')
           .optional()
           .describe(
-            'Name of ingredient group (e.g., "For the marinade", "For the sauce"). Leave blank if only one group.'
+            'Name of ingredient group (e.g., "Marinade", "Sauce"). Leave blank if only one group.'
           ),
         items: z
           .array(
@@ -72,7 +72,7 @@ export const recipeSchema = z.object({
     .min(1, 'At least one ingredient group is required')
     .max(10, 'Too many ingredient groups')
     .describe(
-      'Ingredient groups. Most recipes have one group (leave name blank). Use multiple groups for recipes with sections like "For the marinade", "For the main dish", etc.'
+      'Ingredient groups. Most recipes have one group (leave name blank). Use multiple groups for recipes with sections like "Marinade", "Main dish", etc.'
     ),
 
   instructions: z
@@ -80,11 +80,9 @@ export const recipeSchema = z.object({
       z
         .string()
         .min(1, 'Instruction cannot be empty')
-        .max(500, 'Instruction too long')
         .describe('Individual step in the cooking process')
     )
     .min(1, 'At least one instruction is required')
-    .max(30, 'Too many instructions')
     .describe('Step-by-step cooking instructions'),
 
   notes: z
