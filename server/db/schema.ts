@@ -277,11 +277,16 @@ export const step = pgTable(
     metadata: json('metadata'),
     startedAt: timestamp('started_at').defaultNow().notNull(),
     completedAt: timestamp('completed_at'),
+    parentStepId: text('parent_step_id'),
   },
   (table) => [
     foreignKey({
       columns: [table.jobId],
       foreignColumns: [job.id],
+    }),
+    foreignKey({
+      columns: [table.parentStepId],
+      foreignColumns: [table.id],
     }),
   ]
 );
