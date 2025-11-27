@@ -1,25 +1,21 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-interface StepContext<TMetadata = unknown> {
-  metadata: TMetadata;
+interface StepContext {
+  metadata: Record<string, unknown>;
 }
 
-export const stepContext = new AsyncLocalStorage<StepContext<unknown>>();
+export const stepContext = new AsyncLocalStorage<StepContext>();
 
 export function hasStepContext(): boolean {
   return !!stepContext.getStore();
 }
 
-export function getStepContext<TMetadata = unknown>():
-  | StepContext<TMetadata>
-  | undefined {
-  return stepContext.getStore() as StepContext<TMetadata> | undefined;
+export function getStepContext(): StepContext | undefined {
+  return stepContext.getStore();
 }
 
-export function requireStepContext<
-  TMetadata = unknown
->(): StepContext<TMetadata> {
-  const context = getStepContext<TMetadata>();
+export function requireStepContext(): StepContext {
+  const context = getStepContext();
   if (!context) {
     throw new Error(
       'No step context available. This function must be called within a step.'
@@ -28,13 +24,11 @@ export function requireStepContext<
   return context;
 }
 
-export function getStepMetadata<TMetadata = unknown>(): TMetadata {
-  return requireStepContext<TMetadata>().metadata;
+export function getStepMetadata() {
+  return requireStepContext().metadata;
 }
 
-export function setStepMetadata<TMetadata extends object = object>(
-  updates: Partial<TMetadata>
-): void {
-  const context = requireStepContext<TMetadata>();
+export function setStepMetadata(updates: Record<string, unknown>): void {
+  const context = requireStepContext();
   Object.assign(context.metadata as object, updates);
 }

@@ -3,7 +3,6 @@ import { processIngredients } from '~~/server/jobs/add-recipe/processIngredients
 import { saveRecipe } from '~~/server/jobs/add-recipe/saveRecipe';
 import { scrapeAndCleanContent } from '~~/server/jobs/add-recipe/scrapeAndCleanContent';
 import { job } from '~~/server/jobs/helpers/job';
-import { llmStep } from '~~/server/jobs/helpers/llmStep';
 import { step } from '~~/server/jobs/helpers/step';
 import type { RecipeData } from '~~/server/schemas/recipeSchema';
 import { extractRecipe } from '~~/server/services/prompts/extractRecipe';
@@ -21,7 +20,7 @@ export async function addRecipeByUrl(url: string): Promise<{ id: number }> {
       url
     );
 
-    const { recipe } = await llmStep(
+    const { recipe } = await step(
       'extract-recipe',
       extractRecipe,
       cleanedContent

@@ -1,5 +1,4 @@
 import pLimit from 'p-limit';
-import { llmStep } from '~~/server/jobs/helpers/llmStep';
 import { step } from '~~/server/jobs/helpers/step';
 import type { ParsedIngredient } from '~~/server/schemas/ingredientSchema';
 import type { RecipeData } from '~~/server/schemas/recipeSchema';
@@ -65,7 +64,7 @@ export async function processIngredient(
   rawName: string
 ): Promise<MappedIngredient> {
   // Break it down into pieces
-  const { parsed } = await llmStep(
+  const { parsed } = await step(
     'llm-parse-ingredient',
     parseIngredient,
     rawName
@@ -100,7 +99,7 @@ async function matchIngredientName(inputName: string): Promise<{
 
   // Otherwise use LLM to find similar
   const candidates = await ingredientService.findSimilarIngredients(inputName);
-  const { match } = await llmStep('match-ingredient-via-llm', matchIngredient, {
+  const { match } = await step('match-ingredient-via-llm', matchIngredient, {
     parsedName: inputName,
     candidates,
   });
