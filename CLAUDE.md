@@ -22,6 +22,7 @@ While the name of this project was originally "Anise", it's been re-branded to "
 - ALWAYS run `pnpm lint` and `pnpm typecheck` after making code changes
 - Don't run the dev server yourself - assume it's already running on localhost:3000
 - When needed, ask about using playwright to verify changes in both light and dark mode
+- When you need to do some research to answer a question, try to use `llm.txt` files whenever possible (and relevant). I've linked some for the libraries we use in this project.
 
 ## Vue Development
 

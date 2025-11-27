@@ -1,4 +1,4 @@
-import { recipeScraper } from '../../services/recipeScraper';
+import { addRecipeByUrl } from '~~/server/jobs/add-recipe';
 
 interface RecipeFetchRequest {
   url: string;
@@ -27,10 +27,12 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Use recipe service to fetch and clean content
-  const result = await recipeScraper.fetchByUrl(url);
+  const { id } = await addRecipeByUrl(url);
 
-  return result;
+  return {
+    success: true,
+    id,
+  };
 });
 
 defineRouteMeta({
