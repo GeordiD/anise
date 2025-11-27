@@ -1,5 +1,5 @@
 {
-  "id": "74d2c593-c3bd-4309-b4a0-5c0ea63128f9",
+  "id": "dd7552c0-a935-49f8-8b40-f003af25e0ce",
   "prevId": "b0417f6c-6d63-4922-96fc-46a4889f4ef4",
   "version": "7",
   "dialect": "postgresql",
@@ -834,7 +834,7 @@
         },
         "parent_step_id": {
           "name": "parent_step_id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }

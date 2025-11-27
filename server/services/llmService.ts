@@ -2,6 +2,10 @@ import { createAnthropic } from '@ai-sdk/anthropic';
 import { generateObject, type GenerateObjectResult } from 'ai';
 import type { z } from 'zod';
 import {
+  hasJobContext,
+  updateJobUsage,
+} from '~~/server/jobs/helpers/jobContext';
+import {
   hasStepContext,
   setStepMetadata,
 } from '~~/server/jobs/helpers/stepContext';
@@ -39,10 +43,14 @@ export class LLMService {
       ...props,
     } as Parameters<typeof generateObject>[0]);
 
-    if (hasStepContext()) {
-      const usage = UsageStats.FromLlm(result);
+    const usage = UsageStats.FromLlm(result);
 
+    if (hasStepContext()) {
       setStepMetadata({ usage });
+    }
+
+    if (hasJobContext()) {
+      updateJobUsage(usage);
     }
 
     return result as GenerateObjectResult<z.output<SCHEMA>>;

@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from '~~/server/db';
 import { job as jobTable } from '~~/server/db/schema';
+import type { JobContext } from './jobContext';
 import { jobContext } from './jobContext';
 
 export type JobResult<T> = {
@@ -25,12 +26,20 @@ export async function job<T>(
     throw new Error('Failed to create job');
   }
 
+  const context: JobContext = {
+    jobId: insertedJob.id,
+    metadata: undefined,
+  };
+
   try {
-    const result = await jobContext.run({ jobId: insertedJob.id }, () => fn());
+    const result = await jobContext.run(context, () => fn());
 
     await db
       .update(jobTable)
-      .set({ completedAt: new Date() })
+      .set({
+        completedAt: new Date(),
+        metadata: context.metadata,
+      })
       .where(eq(jobTable.id, insertedJob.id));
 
     return {

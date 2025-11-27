@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from '~~/server/db';
 import { step as stepTable } from '~~/server/db/schema';
-import { requireJobId } from './jobContext';
-import { stepContext } from './stepContext';
+import { requireJobContext } from '~~/server/jobs/helpers/jobContext';
+import type { StepMetadata } from './stepContext';
+import { getStepContext, stepContext } from './stepContext';
 
 /* eslint-disable @typescript-eslint/unified-signatures */
 // Overload for single-parameter functions - accept the parameter directly
@@ -13,7 +14,7 @@ export async function step<
   name: string,
   fn: TFn,
   arg: Parameters<TFn>[0],
-  initialMetadata?: Record<string, unknown>
+  initialMetadata?: StepMetadata
 ): Promise<Awaited<ReturnType<TFn>>>;
 
 // Overload for multi-parameter functions - require tuple
@@ -24,7 +25,7 @@ export async function step<
   name: string,
   fn: TFn,
   args: Parameters<TFn>,
-  initialMetadata?: Record<string, unknown>
+  initialMetadata?: StepMetadata
 ): Promise<Awaited<ReturnType<TFn>>>;
 /* eslint-enable @typescript-eslint/unified-signatures */
 
@@ -34,9 +35,9 @@ export async function step(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fn: (...args: any[]) => unknown,
   propsOrArg: unknown,
-  initialMetadata?: Record<string, unknown>
+  initialMetadata?: StepMetadata
 ): Promise<unknown> {
-  const jobId = requireJobId();
+  const { jobId } = requireJobContext();
   const db = await getDb();
 
   // Normalize to array - if it's not already an array, wrap it
@@ -46,7 +47,8 @@ export async function step(
 
   // Create mutable metadata object
   const metadata: Record<string, unknown> = initialMetadata ?? {};
-  const context = { metadata };
+
+  const parentStepId = getStepContext()?.stepId;
 
   // Insert step record at start
   const [insertedStep] = await db
@@ -56,12 +58,18 @@ export async function step(
       name,
       input: (props.length === 1 ? props[0] : props) as unknown,
       metadata,
+      parentStepId,
     })
     .returning();
 
   if (!insertedStep) {
     throw new Error('Failed to create step');
   }
+
+  const context = {
+    metadata,
+    stepId: insertedStep.id,
+  };
 
   try {
     const result = await stepContext.run(context, async () => {

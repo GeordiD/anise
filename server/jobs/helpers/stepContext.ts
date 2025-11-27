@@ -1,7 +1,12 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
+export type StepMetadata = {
+  usage?: UsageStats;
+} & Record<string, unknown>;
+
 interface StepContext {
-  metadata: Record<string, unknown>;
+  metadata: StepMetadata;
+  stepId: number;
 }
 
 export const stepContext = new AsyncLocalStorage<StepContext>();
