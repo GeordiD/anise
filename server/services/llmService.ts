@@ -4,8 +4,7 @@ import type { z } from 'zod';
 import {
   hasStepContext,
   setStepMetadata,
-} from '~~/server/jobs/helpers/context';
-import type { LlmStepMetadata } from '~~/server/jobs/helpers/llmStep';
+} from '~~/server/jobs/helpers/stepContext';
 import { UsageStats } from '~~/server/utils/UsageStats';
 import type { RecipeData } from '../schemas/recipeSchema';
 
@@ -43,7 +42,7 @@ export class LLMService {
     if (hasStepContext()) {
       const usage = UsageStats.FromLlm(result);
 
-      setStepMetadata<LlmStepMetadata>({ usage });
+      setStepMetadata({ usage });
     }
 
     return result as GenerateObjectResult<z.output<SCHEMA>>;

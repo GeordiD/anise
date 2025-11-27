@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from '~~/server/db';
 import { job as jobTable } from '~~/server/db/schema';
-import { jobContext } from './context';
+import { jobContext } from './jobContext';
 
 export type JobResult<T> = {
   result: T;

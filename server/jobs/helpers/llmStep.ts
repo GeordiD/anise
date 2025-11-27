@@ -11,7 +11,7 @@ export async function llmStep<TInput, TOutput>(
   props: TInput
 ): Promise<TOutput> {
   const initialMetadata: UsageStats = new UsageStats();
-  return step<LlmStepMetadata, TInput, TOutput>(name, fn, props, {
+  return step(name, fn, props, {
     usage: initialMetadata,
   });
 }
