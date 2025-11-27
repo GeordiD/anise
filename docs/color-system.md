@@ -6,7 +6,8 @@ This project uses **Nuxt UI semantic color classes** that automatically handle l
 
 - `text-default` - Primary text (headings, main content)
 - `text-muted` - Secondary text (labels, descriptions)
-- `text-inverted` - Inverted text
+- `text-inverted` - Inverted text for dark backgrounds
+- `text-dimmed` - tertiary text
 
 ## Semantic State Colors
 
@@ -29,9 +30,12 @@ This project uses **Nuxt UI semantic color classes** that automatically handle l
 ### Backgrounds
 - `bg-default` - Main background color for the app
 - `bg-muted` - Secondary background color (should be used for cards placed on top of the background)
+- `bg-accented` - Tertiary background color which used as hover states
+- `bg-elevated` - Used a pressed state
 
 ### Borders
 - `border-default` - border color for all divider lines and borders
+- `border-accented` - same border color as default but some components use this instead of the default property
 
 ### Other Colors
 For non-text elements, use Nuxt UI's semantic classes: `primary`, `secondary`, `success`, `info`, `warning`, `error`, `neutral`
