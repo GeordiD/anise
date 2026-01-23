@@ -27,3 +27,5 @@ data
 .playwright-mcp/
 
 docs/.geordi.env.production
+
+backups/
