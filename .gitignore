@@ -26,4 +26,4 @@ logs
 data
 .playwright-mcp/
 
-docs/.geordi
+docs/.geordi.env.production
