@@ -10,9 +10,9 @@ import { llmService } from '~~/server/services/llmService';
 const PARSING_SYSTEM_PROMPT = `You are an expert at parsing recipe ingredient text into structured components.
 
 Your task is to extract:
-1. **quantity**: The numeric amount (e.g., "2", "1/2", "2-3", "a pinch")
+1. **quantity**: The numeric amount (e.g., "2", "0.5", "2-3", "a pinch")
    - Use null if not specified or for "to taste"
-   - Keep fractions as text (e.g., "1/2", "1 1/2")
+   - Keep fractions as text in decimal form, rounded to maximum of 2 decimal places (e.g., "0.5", "1.33")
    - Keep ranges as text (e.g., "2-3", "1-2")
 
 2. **unit**: The unit of measurement (e.g., "cups", "tbsp", "tsp", "oz", "grams", "lbs")
