@@ -1,6 +1,7 @@
 import type { ParsedIngredient } from '~~/server/schemas/ingredientSchema';
 import { parsedIngredientSchema } from '~~/server/schemas/ingredientSchema';
 import { llmService } from '~~/server/services/llmService';
+import { createErrorCrossEnv as createError } from '~~/server/utils/createError';
 
 /**
  * System prompt for ingredient parsing

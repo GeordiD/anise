@@ -1,6 +1,7 @@
 import type { IngredientMatch } from '~~/server/schemas/ingredientSchema';
 import { ingredientMatchSchema } from '~~/server/schemas/ingredientSchema';
 import { llmService } from '~~/server/services/llmService';
+import { createErrorCrossEnv } from '~~/server/utils/createError';
 
 /**
  * System prompt for ingredient matching
@@ -89,7 +90,7 @@ ${candidatesText}`,
       match: result.object,
     };
   } catch (error) {
-    throw createError({
+    throw createErrorCrossEnv({
       statusCode: 500,
       statusMessage: `Failed to match ingredient "${parsedName}": ${
         error instanceof Error ? error.message : 'Unknown error'

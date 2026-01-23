@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
+import type { UsageStats } from '~~/server/utils/UsageStats';
 
 export type StepMetadata = {
   usage?: UsageStats;

@@ -5,6 +5,7 @@ import type { RecipeData } from '~~/server/schemas/recipeSchema';
 import { ingredientService } from '~~/server/services/ingredientService';
 import { matchIngredient } from '~~/server/services/prompts/matchIngredient';
 import { parseIngredient } from '~~/server/services/prompts/parseIngredient';
+import { createErrorCrossEnv } from '~~/server/utils/createError';
 
 export type MappedIngredient = {
   ingredient: string;
@@ -21,7 +22,7 @@ export async function processIngredients({
 }: Pick<RecipeData, 'ingredients'>): Promise<MappedIngredientGroup[]> {
   const limit = pLimit(5);
   const ingredientNames = ingredientGroups.flatMap(({ items }, i) =>
-    items.map((name) => ({ name, groupIndex: i }))
+    items.map((name) => ({ name, groupIndex: i })),
   );
 
   const tasks = ingredientNames.map(({ name, groupIndex }) =>
@@ -45,9 +46,9 @@ export async function processIngredients({
         {
           rawName: name,
           groupIndex,
-        }
-      )
-    )
+        },
+      ),
+    ),
   );
 
   const ingredientResults = await Promise.all(tasks);
@@ -61,13 +62,13 @@ export async function processIngredients({
 }
 
 export async function processIngredient(
-  rawName: string
+  rawName: string,
 ): Promise<MappedIngredient> {
   // Break it down into pieces
   const { parsed } = await step(
     'llm-parse-ingredient',
     parseIngredient,
-    rawName
+    rawName,
   );
 
   // Match by name
@@ -91,7 +92,7 @@ async function matchIngredientName(inputName: string): Promise<{
   const exactMatch = await step(
     'match-ingredient-via-exact',
     ingredientService.findIngredientByName,
-    inputName
+    inputName,
   );
   if (exactMatch) {
     return exactMatch;
@@ -107,11 +108,11 @@ async function matchIngredientName(inputName: string): Promise<{
   if (match.matchedId !== null) {
     // Found a match - return the existing ingredient
     const existingIngredient = await ingredientService.findIngredientByName(
-      match.standardizedName
+      match.standardizedName,
     );
 
     if (!existingIngredient) {
-      throw createError({
+      throw createErrorCrossEnv({
         statusCode: 500,
         statusMessage: `Matched ingredient ID ${match.matchedId} not found in database`,
       });
@@ -121,11 +122,11 @@ async function matchIngredientName(inputName: string): Promise<{
   } else {
     // No match - create new standardized ingredient
     const createdIngredient = await ingredientService.createIngredient(
-      match.standardizedName
+      match.standardizedName,
     );
 
     if (!createdIngredient) {
-      throw createError({
+      throw createErrorCrossEnv({
         statusCode: 500,
         statusMessage: 'Failed to create new ingredient',
       });

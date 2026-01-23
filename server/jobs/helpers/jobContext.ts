@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { UsageStats } from '~~/server/utils/UsageStats';
 
 export type JobMetadata = {
   usage?: UsageStats;
