@@ -7,8 +7,9 @@ export type DayOfWeek = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursda
 
 export type MealPlanMeal = {
   id: number;
-  recipeId: number;
-  recipeName: string;
+  recipeId: number | null;
+  recipeName: string | null;
+  customText: string | null;
   sortOrder: number;
 };
 
@@ -72,7 +73,8 @@ class MealPlanService {
           .map((meal) => ({
             id: meal.id,
             recipeId: meal.recipeId,
-            recipeName: meal.recipe.name,
+            recipeName: meal.recipe?.name ?? null,
+            customText: meal.customText,
             sortOrder: meal.sortOrder,
           })),
         dinner: day.meals
@@ -80,7 +82,8 @@ class MealPlanService {
           .map((meal) => ({
             id: meal.id,
             recipeId: meal.recipeId,
-            recipeName: meal.recipe.name,
+            recipeName: meal.recipe?.name ?? null,
+            customText: meal.customText,
             sortOrder: meal.sortOrder,
           })),
       })),
@@ -165,9 +168,13 @@ class MealPlanService {
   }
 
   /**
-   * Add a recipe to a specific day and meal type
+   * Add a recipe or custom text meal to a specific day and meal type
    */
-  async addMealToDay(dayId: number, mealType: MealType, recipeId: number): Promise<MealPlanMeal> {
+  async addMealToDay(
+    dayId: number,
+    mealType: MealType,
+    meal: { recipeId: number } | { customText: string }
+  ): Promise<MealPlanMeal> {
     const db = await getDb();
 
     // Get the current max sort order for this day and meal type
@@ -188,12 +195,13 @@ class MealPlanService {
       .values({
         dayId,
         mealType,
-        recipeId,
+        recipeId: 'recipeId' in meal ? meal.recipeId : null,
+        customText: 'customText' in meal ? meal.customText : null,
         sortOrder: maxSortOrder + 1,
       })
       .returning();
 
-    // Fetch the recipe name
+    // Fetch the meal with recipe if applicable
     const mealWithRecipe = await db.query.mealPlanMeals.findFirst({
       where: eq(mealPlanMeals.id, newMeal!.id),
       with: {
@@ -208,7 +216,8 @@ class MealPlanService {
     return {
       id: mealWithRecipe.id,
       recipeId: mealWithRecipe.recipeId,
-      recipeName: mealWithRecipe.recipe.name,
+      recipeName: mealWithRecipe.recipe?.name ?? null,
+      customText: mealWithRecipe.customText,
       sortOrder: mealWithRecipe.sortOrder,
     };
   }

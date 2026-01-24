@@ -216,7 +216,8 @@ export const mealPlanMeals = pgTable(
     id: serial('id').primaryKey(),
     dayId: integer('day_id').notNull(),
     mealType: mealTypeEnum('meal_type').notNull(),
-    recipeId: integer('recipe_id').notNull(),
+    recipeId: integer('recipe_id'),
+    customText: text('custom_text'),
     sortOrder: integer('sort_order').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
@@ -238,6 +239,7 @@ export const shoppingListItems = pgTable(
     id: serial('id').primaryKey(),
     mealPlanId: integer('meal_plan_id').notNull(),
     recipeId: integer('recipe_id'),
+    mealId: integer('meal_id'),
     ingredientText: text('ingredient_text').notNull(),
     checked: boolean('checked').default(false).notNull(),
     sortOrder: integer('sort_order').notNull(),
@@ -252,6 +254,10 @@ export const shoppingListItems = pgTable(
       columns: [table.recipeId],
       foreignColumns: [recipes.id],
     }),
+    foreignKey({
+      columns: [table.mealId],
+      foreignColumns: [mealPlanMeals.id],
+    }).onDelete('set null'),
   ]
 );
 
@@ -401,6 +407,10 @@ export const shoppingListItemsRelations = relations(
     recipe: one(recipes, {
       fields: [shoppingListItems.recipeId],
       references: [recipes.id],
+    }),
+    meal: one(mealPlanMeals, {
+      fields: [shoppingListItems.mealId],
+      references: [mealPlanMeals.id],
     }),
   })
 );

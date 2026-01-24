@@ -6,6 +6,8 @@ export type ShoppingListItem = {
   id: number;
   recipeId: number | null;
   recipeName: string | null;
+  mealId: number | null;
+  mealCustomText: string | null;
   ingredientText: string;
   checked: boolean;
   sortOrder: number;
@@ -23,7 +25,7 @@ class ShoppingListService {
   async addItems(
     userId: number,
     mealPlanId: number,
-    items: Array<{ recipeId: number | null; ingredientText: string }>
+    items: Array<{ recipeId: number | null; mealId: number | null; ingredientText: string }>
   ): Promise<ShoppingListItem[]> {
     const db = await getDb();
 
@@ -56,6 +58,7 @@ class ShoppingListService {
     const itemsToInsert = items.map((item) => ({
       mealPlanId,
       recipeId: item.recipeId,
+      mealId: item.mealId,
       ingredientText: item.ingredientText,
       sortOrder: sortOrder++,
       checked: false,
@@ -63,11 +66,12 @@ class ShoppingListService {
 
     await db.insert(shoppingListItems).values(itemsToInsert).returning();
 
-    // Fetch with recipe names
+    // Fetch with recipe names and meal info
     const result = await db.query.shoppingListItems.findMany({
       where: eq(shoppingListItems.mealPlanId, mealPlanId),
       with: {
         recipe: true,
+        meal: true,
       },
       orderBy: (items, { asc }) => [asc(items.sortOrder)],
     });
@@ -76,6 +80,8 @@ class ShoppingListService {
       id: item.id,
       recipeId: item.recipeId,
       recipeName: item.recipe?.name || null,
+      mealId: item.mealId,
+      mealCustomText: item.meal?.customText || null,
       ingredientText: item.ingredientText,
       checked: item.checked,
       sortOrder: item.sortOrder,
@@ -102,6 +108,7 @@ class ShoppingListService {
       where: eq(shoppingListItems.mealPlanId, mealPlan.id),
       with: {
         recipe: true,
+        meal: true,
       },
       orderBy: (items, { asc }) => [asc(items.sortOrder)],
     });
@@ -116,6 +123,8 @@ class ShoppingListService {
         id: item.id,
         recipeId: item.recipeId,
         recipeName: item.recipe?.name || null,
+        mealId: item.mealId,
+        mealCustomText: item.meal?.customText || null,
         ingredientText: item.ingredientText,
         checked: item.checked,
         sortOrder: item.sortOrder,
@@ -139,6 +148,7 @@ class ShoppingListService {
       with: {
         mealPlan: true,
         recipe: true,
+        meal: true,
       },
     });
 
@@ -177,6 +187,8 @@ class ShoppingListService {
       id: updatedItem.id,
       recipeId: updatedItem.recipeId,
       recipeName: item.recipe?.name || null,
+      mealId: updatedItem.mealId,
+      mealCustomText: item.meal?.customText || null,
       ingredientText: updatedItem.ingredientText,
       checked: updatedItem.checked,
       sortOrder: updatedItem.sortOrder,

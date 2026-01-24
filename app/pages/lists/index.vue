@@ -135,10 +135,10 @@ function goBackToMealPlan() {
               {{ item.ingredientText }}
             </p>
             <p
-              v-if="item.recipeName"
+              v-if="item.recipeName || item.mealCustomText"
               class="text-muted text-sm mt-1"
             >
-              {{ item.recipeName }}
+              {{ item.recipeName || item.mealCustomText }}
             </p>
           </div>
         </li>

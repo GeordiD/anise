@@ -4,8 +4,12 @@ import { mealPlanService, type MealPlanMeal } from '../../services/mealPlanServi
 const addMealSchema = z.object({
   dayId: z.number(),
   mealType: z.enum(['lunch', 'dinner']),
-  recipeId: z.number(),
-});
+}).and(
+  z.union([
+    z.object({ recipeId: z.number() }),
+    z.object({ customText: z.string().min(1).max(200) }),
+  ])
+);
 
 export type AddMealRequest = z.infer<typeof addMealSchema>;
 
@@ -19,10 +23,14 @@ export default defineEventHandler(async (event) => {
 
   const validatedData = addMealSchema.parse(body);
 
+  const mealInput = 'recipeId' in validatedData
+    ? { recipeId: validatedData.recipeId }
+    : { customText: validatedData.customText };
+
   const meal = await mealPlanService.addMealToDay(
     validatedData.dayId,
     validatedData.mealType,
-    validatedData.recipeId
+    mealInput
   );
 
   return {
