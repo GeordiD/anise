@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { MealPlanMeal } from '~~/server/services/mealPlanService';
 import MealPlanRecipeModal from './MealPlanRecipeModal.vue';
-import MealPlanCustomTextModal from './MealPlanCustomTextModal.vue';
 
 const props = defineProps<{
   dayId: number;
@@ -13,17 +12,9 @@ const mealLabel = computed(() => (props.mealType === 'lunch' ? 'L' : 'D'));
 
 const overlay = useOverlay();
 const recipeModal = overlay.create(MealPlanRecipeModal);
-const customTextModal = overlay.create(MealPlanCustomTextModal);
 
 function openRecipeModal() {
   recipeModal.open({
-    dayId: props.dayId,
-    mealType: props.mealType,
-  });
-}
-
-function openCustomTextModal() {
-  customTextModal.open({
     dayId: props.dayId,
     mealType: props.mealType,
   });
@@ -51,21 +42,12 @@ async function handleRemoveMeal(mealId: number) {
       <div class="text-default font-medium w-6">
         {{ mealLabel }}
       </div>
-      <div class="flex flex-1 gap-2">
-        <UButton
-          class="flex-1 justify-center"
-          @click="openRecipeModal"
-        >
-          Add Recipe
-        </UButton>
-        <UButton
-          class="flex-1 justify-center"
-          variant="outline"
-          @click="openCustomTextModal"
-        >
-          Add Text
-        </UButton>
-      </div>
+      <UButton
+        class="flex-1"
+        @click="openRecipeModal"
+      >
+        Add Meal
+      </UButton>
     </div>
 
     <!-- Meal list -->

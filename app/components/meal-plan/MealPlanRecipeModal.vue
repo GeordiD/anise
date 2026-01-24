@@ -65,6 +65,29 @@ async function handleSelect() {
   }
 }
 
+async function handleAddWithoutRecipe() {
+  if (!searchQuery.value.trim()) return;
+
+  try {
+    const payload: AddMealRequest = {
+      dayId: props.dayId,
+      mealType: props.mealType,
+      customText: searchQuery.value.trim(),
+    };
+
+    await $fetch('/api/meal-plan/meals', {
+      method: 'POST',
+      body: payload,
+    });
+
+    await refreshNuxtData('meal-plan');
+    emit('close', true);
+  } catch (err) {
+    console.error('Failed to add custom meal:', err);
+    // TODO: Show error toast
+  }
+}
+
 function handleClose() {
   emit('close', false);
 }
@@ -99,6 +122,17 @@ function resetState() {
             placeholder="Search recipes..."
             class="w-full"
           />
+
+          <!-- Add without recipe button (only shows when there's search text) -->
+          <UButton
+            v-if="searchQuery.trim()"
+            variant="outline"
+            block
+            icon="i-heroicons-plus"
+            @click="handleAddWithoutRecipe"
+          >
+            Add "{{ searchQuery.trim() }}" without recipe
+          </UButton>
 
           <!-- Recipe list -->
           <div class="max-h-96 overflow-y-auto space-y-2">
