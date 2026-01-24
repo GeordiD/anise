@@ -111,6 +111,7 @@ function resetState() {
               <div class="flex items-center gap-3">
                 <UCheckbox
                   :model-value="selectedRecipeIds.includes(recipe.id)"
+                  @click.stop
                   @update:model-value="toggleRecipe(recipe.id)"
                 />
                 <div class="flex-1">

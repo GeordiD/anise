@@ -55,7 +55,7 @@ function resetState() {
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-default">Add Custom Meal</h3>
+            <h3 class="text-lg font-semibold text-default">Add Free Form</h3>
             <UButton
               icon="i-heroicons-x-mark"
               color="neutral"
@@ -66,9 +66,6 @@ function resetState() {
         </template>
 
         <div class="space-y-4">
-          <p class="text-sm text-muted">
-            Add a custom meal like "Leftovers", "Eating out", or "Takeout"
-          </p>
           <UInput
             v-model="customText"
             placeholder="e.g., Leftovers"
@@ -80,9 +77,7 @@ function resetState() {
 
         <template #footer>
           <div class="flex justify-end gap-2">
-            <UButton @click="handleClose">
-              Cancel
-            </UButton>
+            <UButton @click="handleClose"> Cancel </UButton>
             <UButton
               color="primary"
               variant="solid"
