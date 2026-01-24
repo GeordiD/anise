@@ -259,6 +259,18 @@ class MealPlanService {
   }
 
   /**
+   * Update the custom text of a meal
+   */
+  async updateMealCustomText(mealId: number, customText: string): Promise<void> {
+    const db = await getDb();
+
+    await db
+      .update(mealPlanMeals)
+      .set({ customText })
+      .where(eq(mealPlanMeals.id, mealId));
+  }
+
+  /**
    * Update the week start day preference
    */
   async updateWeekStartDay(weekStartDay: DayOfWeek): Promise<void> {

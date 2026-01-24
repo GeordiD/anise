@@ -20,6 +20,44 @@ function openRecipeModal() {
   });
 }
 
+// Inline editing state
+const editingMealId = ref<number | null>(null);
+const editingText = ref('');
+
+function startEditing(meal: MealPlanMeal) {
+  editingMealId.value = meal.id;
+  editingText.value = meal.customText || '';
+}
+
+function cancelEditing() {
+  editingMealId.value = null;
+  editingText.value = '';
+}
+
+async function saveEditing(mealId: number) {
+  if (!editingText.value.trim()) {
+    cancelEditing();
+    return;
+  }
+
+  try {
+    await $fetch(`/api/meal-plan/meals/${mealId}`, {
+      method: 'PATCH',
+      body: {
+        customText: editingText.value.trim(),
+      },
+    });
+
+    await refreshNuxtData('meal-plan');
+  } catch (err) {
+    console.error('Failed to update meal:', err);
+    // TODO: Show error toast
+  } finally {
+    editingMealId.value = null;
+    editingText.value = '';
+  }
+}
+
 // Remove meal from plan
 async function handleRemoveMeal(mealId: number) {
   try {
@@ -59,12 +97,45 @@ async function handleRemoveMeal(mealId: number) {
         >
           {{ meal.recipeName }}
         </NuxtLink>
-        <!-- Custom text meal (no link) -->
-        <div v-else class="flex items-center gap-2 flex-1 text-default">
-          <UIcon name="i-heroicons-pencil" class="text-muted w-4 h-4" />
-          {{ meal.customText }}
+        <!-- Custom text meal (editable) -->
+        <div v-else class="flex items-center gap-2 flex-1">
+          <!-- Editing mode -->
+          <template v-if="editingMealId === meal.id">
+            <UInput
+              v-model="editingText"
+              size="sm"
+              class="flex-1"
+              autofocus
+              @keydown.enter="saveEditing(meal.id)"
+              @keydown.escape="cancelEditing"
+              @blur="cancelEditing"
+            />
+          </template>
+          <!-- Display mode -->
+          <template v-else>
+            <button
+              type="button"
+              class="flex items-center gap-2 text-default hover:text-primary-600"
+              @click="startEditing(meal)"
+            >
+              <UIcon name="i-heroicons-pencil" class="text-muted w-4 h-4" />
+              {{ meal.customText }}
+            </button>
+          </template>
         </div>
+        <!-- Save button (when editing this meal) -->
         <UButton
+          v-if="editingMealId === meal.id"
+          icon="i-heroicons-check"
+          color="primary"
+          variant="ghost"
+          size="xs"
+          @mousedown.prevent
+          @click="saveEditing(meal.id)"
+        />
+        <!-- Remove button (when not editing) -->
+        <UButton
+          v-else
           icon="i-heroicons-x-mark"
           color="neutral"
           variant="ghost"
