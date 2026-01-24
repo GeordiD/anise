@@ -66,13 +66,13 @@ async function handleSelect() {
 }
 
 async function handleAddWithoutRecipe() {
-  if (!searchQuery.value.trim()) return;
+  const customText = searchQuery.value.trim() || 'Leftovers';
 
   try {
     const payload: AddMealRequest = {
       dayId: props.dayId,
       mealType: props.mealType,
-      customText: searchQuery.value.trim(),
+      customText,
     };
 
     await $fetch('/api/meal-plan/meals', {
@@ -123,15 +123,14 @@ function resetState() {
             class="w-full"
           />
 
-          <!-- Add without recipe button (only shows when there's search text) -->
+          <!-- Add without recipe button -->
           <UButton
-            v-if="searchQuery.trim()"
             variant="outline"
             block
             icon="i-heroicons-plus"
             @click="handleAddWithoutRecipe"
           >
-            Add "{{ searchQuery.trim() }}" without recipe
+            Add "{{ searchQuery.trim() || 'Leftovers' }}" without recipe
           </UButton>
 
           <!-- Recipe list -->

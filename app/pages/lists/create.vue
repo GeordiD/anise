@@ -33,7 +33,7 @@ const uniqueRecipeIds = computed(() => {
   return Array.from(recipeIds);
 });
 
-// Extract custom text meals from the meal plan
+// Extract custom text meals from the meal plan (excluding "Leftovers")
 type CustomMeal = {
   mealId: number;
   text: string;
@@ -46,7 +46,8 @@ const customMeals = computed(() => {
 
   for (const day of mealPlan.value.days) {
     for (const meal of [...day.lunch, ...day.dinner]) {
-      if (meal.customText && !meal.recipeId) {
+      // Skip "Leftovers" since it doesn't need ingredients
+      if (meal.customText && !meal.recipeId && meal.customText !== 'Leftovers') {
         meals.push({
           mealId: meal.id,
           text: meal.customText,
@@ -69,6 +70,8 @@ type RecipeWithIngredients = {
   id: number;
   name: string;
   ingredients: SelectableIngredient[];
+  additionalIngredients: SelectableIngredient[];
+  nextAdditionalId: number;
 };
 
 // Type for custom meal step with manually added ingredients
@@ -108,9 +111,13 @@ const isLastStep = computed(() => currentStep.value === totalSteps.value - 1);
 // Check if there are any items to show
 const hasItems = computed(() => totalSteps.value > 0);
 
+// Additional ingredient input for recipes
+const additionalIngredientText = ref('');
+
 // Navigate to previous step
 function goBack() {
   if (!isFirstStep.value) {
+    additionalIngredientText.value = '';
     currentStep.value--;
   }
 }
@@ -120,6 +127,7 @@ async function goNext() {
   if (isLastStep.value) {
     await finish();
   } else {
+    additionalIngredientText.value = '';
     currentStep.value++;
   }
 }
@@ -139,6 +147,36 @@ function updateIngredientText(ingredientId: number, newText: string) {
   if (!currentRecipe.value) return;
 
   const ingredient = currentRecipe.value.ingredients.find(i => i.id === ingredientId);
+  if (ingredient) {
+    ingredient.text = newText;
+  }
+}
+
+function addAdditionalIngredient() {
+  if (!currentRecipe.value || !additionalIngredientText.value.trim()) return;
+
+  currentRecipe.value.additionalIngredients.push({
+    id: currentRecipe.value.nextAdditionalId++,
+    text: additionalIngredientText.value.trim(),
+    selected: true,
+  });
+
+  additionalIngredientText.value = '';
+}
+
+function toggleAdditionalIngredient(ingredientId: number) {
+  if (!currentRecipe.value) return;
+
+  const ingredient = currentRecipe.value.additionalIngredients.find(i => i.id === ingredientId);
+  if (ingredient) {
+    ingredient.selected = !ingredient.selected;
+  }
+}
+
+function updateAdditionalIngredientText(ingredientId: number, newText: string) {
+  if (!currentRecipe.value) return;
+
+  const ingredient = currentRecipe.value.additionalIngredients.find(i => i.id === ingredientId);
   if (ingredient) {
     ingredient.text = newText;
   }
@@ -189,6 +227,15 @@ async function finish() {
     for (const recipe of recipes.value) {
       for (const ingredient of recipe.ingredients) {
         if (ingredient.selected) {
+          selectedItems.push({
+            recipeId: recipe.id,
+            ingredientText: ingredient.text,
+          });
+        }
+      }
+      // Include additional freeform ingredients
+      for (const ingredient of recipe.additionalIngredients) {
+        if (ingredient.selected && ingredient.text.trim()) {
           selectedItems.push({
             recipeId: recipe.id,
             ingredientText: ingredient.text,
@@ -266,6 +313,8 @@ onMounted(async () => {
               selected: false,
             }))
         ),
+        additionalIngredients: [],
+        nextAdditionalId: 1,
       }));
     }
 
@@ -351,10 +400,52 @@ onMounted(async () => {
 
           <!-- Empty state for no ingredients -->
           <div
-            v-if="currentRecipe.ingredients.length === 0"
+            v-if="currentRecipe.ingredients.length === 0 && currentRecipe.additionalIngredients.length === 0"
             class="text-center py-8 text-muted"
           >
             No ingredients available for this recipe
+          </div>
+
+          <!-- Additional ingredients added by user -->
+          <div
+            v-for="ingredient in currentRecipe.additionalIngredients"
+            :key="'additional-' + ingredient.id"
+            class="flex items-start gap-3"
+          >
+            <UCheckbox
+              :model-value="ingredient.selected"
+              class="mt-2.5"
+              @update:model-value="toggleAdditionalIngredient(ingredient.id)"
+            />
+            <div class="flex-1">
+              <UInput
+                :model-value="ingredient.text"
+                class="w-full"
+                @update:model-value="(value: string) => updateAdditionalIngredientText(ingredient.id, value)"
+              />
+            </div>
+          </div>
+
+          <!-- Add additional ingredient input -->
+          <div class="flex items-start gap-3">
+            <div class="w-5" />
+            <div class="flex-1">
+              <UInput
+                v-model="additionalIngredientText"
+                class="w-full"
+                placeholder="Additional ingredient..."
+                @keydown.enter="addAdditionalIngredient"
+              />
+            </div>
+            <UButton
+              v-if="additionalIngredientText.trim()"
+              icon="i-heroicons-check"
+              color="primary"
+              variant="ghost"
+              size="sm"
+              class="mt-1"
+              @click="addAdditionalIngredient"
+            />
           </div>
         </div>
       </div>
