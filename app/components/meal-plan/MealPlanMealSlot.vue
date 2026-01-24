@@ -37,26 +37,20 @@ async function handleRemoveMeal(mealId: number) {
 </script>
 
 <template>
-  <div class="space-y-2">
-    <div class="flex items-center gap-3">
+  <div class="space-y-1">
+    <!-- Meal rows -->
+    <div
+      v-for="meal in meals"
+      :key="meal.id"
+      class="flex items-center gap-3"
+    >
+      <!-- Column 1: L/D label (only on first row) -->
       <div class="text-default font-medium w-6">
-        {{ mealLabel }}
+        {{ meals.indexOf(meal) === 0 ? mealLabel : '' }}
       </div>
-      <UButton
-        class="flex-1"
-        @click="openRecipeModal"
-      >
-        Add Meal
-      </UButton>
-    </div>
 
-    <!-- Meal list -->
-    <div v-if="meals.length > 0" class="ml-9 space-y-1">
-      <div
-        v-for="meal in meals"
-        :key="meal.id"
-        class="flex items-center justify-between bg-neutral-100 dark:bg-neutral-800 px-3 py-2 rounded text-sm"
-      >
+      <!-- Column 2: Meal content -->
+      <div class="flex-1 flex items-center justify-between bg-neutral-100 dark:bg-neutral-800 px-3 py-2 rounded text-sm">
         <!-- Recipe meal (with link) -->
         <NuxtLink
           v-if="meal.recipeId"
@@ -76,6 +70,42 @@ async function handleRemoveMeal(mealId: number) {
           variant="ghost"
           size="xs"
           @click="handleRemoveMeal(meal.id)"
+        />
+      </div>
+
+      <!-- Column 3: Add button (only on first row) -->
+      <div class="w-8">
+        <UButton
+          v-if="meals.indexOf(meal) === 0"
+          icon="i-heroicons-plus"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          @click="openRecipeModal"
+        />
+      </div>
+    </div>
+
+    <!-- Empty state row (when no meals) -->
+    <div v-if="meals.length === 0" class="flex items-center gap-3">
+      <!-- Column 1: L/D label -->
+      <div class="text-default font-medium w-6">
+        {{ mealLabel }}
+      </div>
+
+      <!-- Column 2: Empty placeholder -->
+      <div class="flex-1 text-muted text-sm">
+        No meals
+      </div>
+
+      <!-- Column 3: Add button -->
+      <div class="w-8">
+        <UButton
+          icon="i-heroicons-plus"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          @click="openRecipeModal"
         />
       </div>
     </div>
