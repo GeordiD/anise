@@ -65,6 +65,29 @@ async function handleSelect() {
   }
 }
 
+async function handleAddWithoutRecipe() {
+  const customText = searchQuery.value.trim() || 'Leftovers';
+
+  try {
+    const payload: AddMealRequest = {
+      dayId: props.dayId,
+      mealType: props.mealType,
+      customText,
+    };
+
+    await $fetch('/api/meal-plan/meals', {
+      method: 'POST',
+      body: payload,
+    });
+
+    await refreshNuxtData('meal-plan');
+    emit('close', true);
+  } catch (err) {
+    console.error('Failed to add custom meal:', err);
+    // TODO: Show error toast
+  }
+}
+
 function handleClose() {
   emit('close', false);
 }
@@ -100,6 +123,16 @@ function resetState() {
             class="w-full"
           />
 
+          <!-- Add without recipe button -->
+          <UButton
+            variant="outline"
+            block
+            icon="i-heroicons-plus"
+            @click="handleAddWithoutRecipe"
+          >
+            Add "{{ searchQuery.trim() || 'Leftovers' }}" without recipe
+          </UButton>
+
           <!-- Recipe list -->
           <div class="max-h-96 overflow-y-auto space-y-2">
             <UCard
@@ -111,6 +144,7 @@ function resetState() {
               <div class="flex items-center gap-3">
                 <UCheckbox
                   :model-value="selectedRecipeIds.includes(recipe.id)"
+                  @click.stop
                   @update:model-value="toggleRecipe(recipe.id)"
                 />
                 <div class="flex-1">

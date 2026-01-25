@@ -5,6 +5,7 @@ const addItemsSchema = z.object({
   items: z.array(
     z.object({
       recipeId: z.number().nullable(),
+      mealId: z.number().nullable().optional(),
       ingredientText: z.string(),
     })
   ),
@@ -34,7 +35,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const addedItems = await shoppingListService.addItems(userId, mealPlan.mealPlan.id, items);
+  const itemsWithMealId = items.map((item) => ({
+    recipeId: item.recipeId,
+    mealId: item.mealId ?? null,
+    ingredientText: item.ingredientText,
+  }));
+
+  const addedItems = await shoppingListService.addItems(userId, mealPlan.mealPlan.id, itemsWithMealId);
 
   return {
     success: true,
