@@ -25,6 +25,7 @@
     "@tanstack/vue-table": "^8.21.3",
     "@types/pg": "^8.15.5",
     "@vueuse/core": "^14.0.0",
+    "@vueuse/integrations": "^14.1.0",
     "@vueuse/nuxt": "^14.0.0",
     "ai": "^5.0.93",
     "chalk": "^5.6.2",
@@ -38,6 +39,7 @@
     "p-limit": "^7.2.0",
     "pg": "^8.16.3",
     "postgres": "^3.4.7",
+    "sortablejs": "^1.15.6",
     "typescript": "^5.6.3",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1",
@@ -45,6 +47,7 @@
     "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
+    "@types/sortablejs": "^1.15.9",
     "@vite-pwa/nuxt": "^1.0.7",
     "drizzle-kit": "^0.31.4",
     "tailwindcss": "^4.1.12",
