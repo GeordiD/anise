@@ -39,13 +39,13 @@ async function handleClearAll() {
       <p class="text-muted">Plan your meals for the week</p>
     </div>
 
-    <!-- Loading state -->
-    <div v-if="pending" class="flex justify-center py-12">
+    <!-- Loading state (only on initial load, not subsequent refreshes) -->
+    <div v-if="pending && !mealPlan" class="flex justify-center py-12">
       <div class="text-muted">Loading meal plan...</div>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="text-error py-12 text-center">
+    <div v-else-if="error && !mealPlan" class="text-error py-12 text-center">
       <p>Failed to load meal plan. Please try again later.</p>
     </div>
 
