@@ -11,7 +11,6 @@ const {
   data: listData,
   pending,
   error,
-  refresh,
 } = await useFetch<GetShoppingListResponse>('/api/shopping-list');
 
 const shoppingList = computed(() => listData.value?.list);
@@ -42,9 +41,12 @@ async function toggleItemChecked(itemId: number, currentChecked: boolean) {
       },
     });
 
-    // Clear optimistic state and refresh
+    // Update local data directly to avoid scroll position reset
+    const item = listData.value?.list?.items.find(i => i.id === itemId);
+    if (item) {
+      item.checked = newChecked;
+    }
     optimisticCheckedState.value.delete(itemId);
-    await refresh();
   } catch (err) {
     console.error('Failed to update item:', err);
     // Revert optimistic update on error
