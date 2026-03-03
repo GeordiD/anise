@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { GetRecipeByIdResponse } from '~~/server/api/recipes/[id].get'
 import RecipeIngredientsEditModal from './ingredient/RecipeIngredientsEditModal.vue'
+import RecipeEditNameModal from './RecipeEditNameModal.vue'
 
 const props = defineProps<{
   recipe: GetRecipeByIdResponse
@@ -12,6 +13,7 @@ const isDeleting = ref(false)
 
 const overlay = useOverlay()
 const editModal = overlay.create(RecipeIngredientsEditModal)
+const editNameModal = overlay.create(RecipeEditNameModal)
 
 const handleBackClick = () => {
   router.push('/')
@@ -42,8 +44,20 @@ const handleDelete = async () => {
   }
 }
 
+const handleEditName = () => {
+  editNameModal.open({
+    recipe: props.recipe,
+  })
+}
+
 const items = computed(() => [
   [
+    {
+      label: 'Edit Recipe Name',
+      icon: 'i-heroicons-pencil',
+      color: 'neutral' as const,
+      onSelect: handleEditName,
+    },
     {
       label: 'Edit Recipe',
       icon: 'i-heroicons-pencil-square',

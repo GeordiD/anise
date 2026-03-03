@@ -95,6 +95,18 @@ class RecipeService {
     };
   }
 
+  async updateRecipeName(id: number, name: string): Promise<boolean> {
+    const db = await getDb();
+
+    const result = await db
+      .update(recipes)
+      .set({ name, updatedAt: new Date() })
+      .where(eq(recipes.id, id))
+      .returning();
+
+    return result.length > 0;
+  }
+
   async softDeleteRecipe(id: number): Promise<boolean> {
     const db = await getDb();
 
