@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import AddRecipeManuallyModal from '~/components/recipe/AddRecipeManuallyModal.vue';
+
+const overlay = useOverlay();
+const manualModal = overlay.create(AddRecipeManuallyModal);
+
 interface FetchRecipeRequest {
   url: string
 }
@@ -121,6 +126,22 @@ const handleSubmit = async () => {
         variant="solid"
         :title="errorMessage"
       />
+
+      <!-- Add Manually -->
+      <div class="flex items-center gap-4">
+        <div class="flex-1 border-t border-default" />
+        <span class="text-sm text-muted">or</span>
+        <div class="flex-1 border-t border-default" />
+      </div>
+      <UButton
+        color="neutral"
+        variant="outline"
+        size="lg"
+        class="w-full"
+        @click="manualModal.open({})"
+      >
+        Add Manually
+      </UButton>
 
       <!-- Instructions -->
       <UCard class="bg-info-50 dark:bg-info-900/20 border-info-200 dark:border-info-700">
